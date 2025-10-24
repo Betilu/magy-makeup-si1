@@ -61,8 +61,22 @@ class UserSeeder extends Seeder
         ]);
 
         $roleCliente = Role::create(['name' => 'cliente']);
-        $clienteUser->assignRole($roleCliente);        
+        $clienteUser->assignRole($roleCliente);   
+        
+        // ---------------------------------------------------------------
+
+        $estilistaUser = User::query()->create([
+            'name' => 'estilista',
+            'email' => 'estilista@cliente.com',
+            'password' => '12345',
+            'email_verified_at' => now()
+        ]);
+
+        $roleEstilista = Role::create(['name' => 'estilista']);
+        $estilistaUser->assignRole($roleEstilista);        
     }
+
+    
 
     
 }

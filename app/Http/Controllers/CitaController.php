@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Cita;
 
 class CitaController extends Controller
 {
@@ -11,7 +12,8 @@ class CitaController extends Controller
      */
     public function index()
     {
-        //
+        $citas = Cita::all();
+        return view('citas.index', compact('citas'));
     }
 
     /**
@@ -19,7 +21,7 @@ class CitaController extends Controller
      */
     public function create()
     {
-        //
+        return view('citas.create');
     }
 
     /**
@@ -27,7 +29,17 @@ class CitaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'estado' => 'required|string',
+            'anticipo' => 'required|numeric',
+            'fecha' => 'required|string',
+            'hora' => 'required|string',
+            'tipo' => 'required|string',
+        ]);
+
+        Cita::create($validated);
+        return redirect()->route('citas.index')->with('success', 'Cita creada correctamente');
     }
 
     /**
@@ -35,7 +47,8 @@ class CitaController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $cita = Cita::findOrFail($id);
+        return view('citas.show', compact('cita'));
     }
 
     /**
@@ -43,7 +56,8 @@ class CitaController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $cita = Cita::findOrFail($id);
+        return view('citas.edit', compact('cita'));
     }
 
     /**
@@ -51,7 +65,19 @@ class CitaController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $cita = Cita::findOrFail($id);
+
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'estado' => 'required|string',
+            'anticipo' => 'required|numeric',
+            'fecha' => 'required|string',
+            'hora' => 'required|string',
+            'tipo' => 'required|string',
+        ]);
+
+        $cita->update($validated);
+        return redirect()->route('citas.index')->with('success', 'Cita actualizada correctamente');
     }
 
     /**
@@ -59,6 +85,8 @@ class CitaController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $cita = Cita::findOrFail($id);
+        $cita->delete();
+        return redirect()->route('citas.index')->with('success', 'Cita eliminada correctamente');
     }
 }
