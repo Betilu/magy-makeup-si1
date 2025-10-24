@@ -18,8 +18,24 @@ class ClientController extends Controller
      */
     public function index(Request $request)
     {
-        // Obtener todos los clientes con sus usuarios
-        $clients = Client::with('user')->latest()->paginate(15);
+        $query = Client::with('user');
+
+        // Aplicar filtros de búsqueda
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('user', function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('telefono', 'like', "%{$search}%");
+            })->orWhere('direccion', 'like', "%{$search}%");
+        }
+
+        // Filtro por frecuencia
+        if ($request->filled('frecuencia')) {
+            $query->where('frecuencia', $request->frecuencia);
+        }
+
+        $clients = $query->latest()->paginate(15)->withQueryString();
 
         if ($request->wantsJson()) {
             return response()->json($clients);

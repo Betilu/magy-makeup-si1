@@ -4,15 +4,36 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Horario;
+use Illuminate\Support\Facades\Log;
 
 class HorarioController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $horarios = Horario::all();
+        $query = Horario::query();
+
+        // Aplicar filtros de búsqueda
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('dia', 'like', "%{$search}%")
+                  ->orWhere('horaInicio', 'like', "%{$search}%")
+                  ->orWhere('horaFin', 'like', "%{$search}%");
+        }
+
+        // Filtro por día
+        if ($request->filled('dia')) {
+            $query->where('dia', $request->dia);
+        }
+
+        $horarios = $query->latest()->paginate(15)->withQueryString();
+
+        if ($request->wantsJson()) {
+            return response()->json($horarios);
+        }
+
         return view('horarios.index', compact('horarios'));
     }
 
@@ -30,13 +51,26 @@ class HorarioController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'dia' => 'required|string',
-            'horaInicio' => 'required|string',
-            'horaFin' => 'required|string',
+            'dia' => 'required|string|max:255',
+            'horaInicio' => 'required|date_format:H:i',
+            'horaFin' => 'required|date_format:H:i|after:horaInicio',
+        ], [
+            'horaFin.after' => 'La hora de fin debe ser posterior a la hora de inicio.',
         ]);
 
-        Horario::create($validated);
-        return redirect()->route('horarios.index')->with('success', 'Horario creado correctamente');
+        try {
+            Horario::create($validated);
+            
+            Log::info('Horario creado', [
+                'user_id' => auth()->id(),
+                'dia' => $validated['dia']
+            ]);
+
+            return redirect()->route('horarios.index')->with('success', 'Horario creado correctamente.');
+        } catch (\Exception $e) {
+            Log::error('Error al crear horario: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Error al crear el horario.');
+        }
     }
 
     /**
@@ -65,13 +99,26 @@ class HorarioController extends Controller
         $horario = Horario::findOrFail($id);
 
         $validated = $request->validate([
-            'dia' => 'required|string',
-            'horaInicio' => 'required|string',
-            'horaFin' => 'required|string',
+            'dia' => 'required|string|max:255',
+            'horaInicio' => 'required|date_format:H:i',
+            'horaFin' => 'required|date_format:H:i|after:horaInicio',
+        ], [
+            'horaFin.after' => 'La hora de fin debe ser posterior a la hora de inicio.',
         ]);
 
-        $horario->update($validated);
-        return redirect()->route('horarios.index')->with('success', 'Horario actualizado correctamente');
+        try {
+            $horario->update($validated);
+            
+            Log::info('Horario actualizado', [
+                'user_id' => auth()->id(),
+                'horario_id' => $id
+            ]);
+
+            return redirect()->route('horarios.index')->with('success', 'Horario actualizado correctamente.');
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar horario: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Error al actualizar el horario.');
+        }
     }
 
     /**
@@ -79,8 +126,22 @@ class HorarioController extends Controller
      */
     public function destroy(string $id)
     {
-        $horario = Horario::findOrFail($id);
-        $horario->delete();
-        return redirect()->route('horarios.index')->with('success', 'Horario eliminado correctamente');
+        try {
+            $horario = Horario::findOrFail($id);
+            $dia = $horario->dia;
+            
+            $horario->delete();
+            
+            Log::info('Horario eliminado', [
+                'user_id' => auth()->id(),
+                'horario_id' => $id,
+                'dia' => $dia
+            ]);
+
+            return redirect()->route('horarios.index')->with('success', 'Horario eliminado correctamente.');
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar horario: ' . $e->getMessage());
+            return back()->with('error', 'Error al eliminar el horario.');
+        }
     }
 }
