@@ -19,8 +19,29 @@ class EstilistaController extends Controller
      */
     public function index(Request $request)
     {
-        // Obtener todos los estilistas con sus usuarios y horarios
-        $estilistas = Estilista::with('user', 'horario')->latest()->paginate(15);
+        $query = Estilista::with('user', 'horario');
+
+        // Aplicar filtros de búsqueda
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('user', function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            })->orWhere('especialidad', 'like', "%{$search}%")
+              ->orWhere('disponibilidad', 'like', "%{$search}%");
+        }
+
+        // Filtro por calificación
+        if ($request->filled('calificacion')) {
+            $query->where('calificacion', $request->calificacion);
+        }
+
+        // Filtro por disponibilidad
+        if ($request->filled('disponibilidad')) {
+            $query->where('disponibilidad', 'like', "%{$request->disponibilidad}%");
+        }
+
+        $estilistas = $query->latest()->paginate(15)->withQueryString();
 
         if ($request->wantsJson()) {
             return response()->json($estilistas);

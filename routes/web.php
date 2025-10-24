@@ -53,7 +53,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('clients', ClientController::class);
 
     // Rutas de herramientas
-    Route::resource('tools', HerramientaController::class);
+    Route::resource('herramientas', HerramientaController::class);
 
     // Rutas de horarios
     Route::resource('horarios', HorarioController::class);
