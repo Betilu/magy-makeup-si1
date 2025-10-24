@@ -42,6 +42,61 @@
         </li>
     @endcan
 
+    @can('ver clientes')
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('clients.index') }}">
+                <svg class="nav-icon">
+                    <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
+                </svg>
+                {{ __('Clientes') }}
+            </a>
+        </li>
+    @endcan
+
+    @can('ver horarios')
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('horarios.index') }}">
+                <svg class="nav-icon">
+                    <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
+                </svg>
+                {{ __('Horarios') }}
+            </a>
+        </li>
+    @endcan
+
+    @can('ver citas')
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('citas.index') }}">
+                <svg class="nav-icon">
+                    <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
+                </svg>
+                {{ __('Citas') }}
+            </a>
+        </li>
+    @endcan
+
+    @can('ver estilistas')
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('estilistas.index') }}">
+                <svg class="nav-icon">
+                    <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
+                </svg>
+                {{ __('Estilistas') }}
+            </a>
+        </li>
+    @endcan
+
+    @can('ver notificaciones')
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('notificacions.index') }}">
+                <svg class="nav-icon">
+                    <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
+                </svg>
+                {{ __('Notificaciones') }}
+            </a>
+        </li>
+    @endcan
+          
     {{-- @can('ver libros')
         <li class="nav-item">
             <a class="nav-link" href="{{ route('books.index') }}">

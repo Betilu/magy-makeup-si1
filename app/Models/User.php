@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable
 {
@@ -46,5 +47,17 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Un usuario solo puede ser un cliente
+    public function client(): HasOne
+    {
+        return $this->hasOne(Client::class);
+    }
+
+    // Un usuario solo puede ser un estilista
+    public function estilista(): HasOne
+    {
+        return $this->hasOne(Estilista::class);
     }
 }

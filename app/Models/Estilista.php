@@ -3,37 +3,31 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Estilista extends Model
 {
-    use HasFactory;
-
-    protected $table = 'estilistas';
-
     protected $fillable = [
-        'horario_id',
         'user_id',
+        'horario_id',
         'calificacion',
         'comision',
         'disponibilidad',
         'especialidad',
     ];
 
-    // Relaciones
-    public function user()
+    protected $casts = [
+        'calificacion' => 'integer',
+        'comision' => 'decimal:2',
+    ];
+
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function horario()
+    public function horario(): BelongsTo
     {
         return $this->belongsTo(Horario::class);
-    }
-
-    // 👥 Si más adelante un estilista tiene muchas citas:
-    public function citas()
-    {
-        return $this->hasMany(Cita::class);
     }
 }

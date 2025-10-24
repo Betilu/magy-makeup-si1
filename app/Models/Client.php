@@ -3,12 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Client extends Model
 {
-     use HasFactory;
-
     // Nombre de la tabla (opcional si sigue convención)
     protected $table = 'clients';
 
@@ -20,10 +18,14 @@ class Client extends Model
         'observacion',
     ];
 
+    protected $casts = [
+        'frecuencia' => 'integer',
+    ];
+
     /**
      * Relación: un cliente pertenece a un usuario.
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
