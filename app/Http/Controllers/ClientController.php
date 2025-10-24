@@ -51,6 +51,7 @@ class ClientController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'direccion' => 'required|string|max:255',
             'frecuencia' => 'required|integer|min:0',
+            'telefono' => 'required|integer|min:0',
             'observacion' => 'nullable|string',
         ]);
 
@@ -60,6 +61,7 @@ class ClientController extends Controller
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
+                'telefono' => $data['telefono'],
                 'password' => Hash::make($data['password']),
             ]);
 
@@ -143,6 +145,7 @@ class ClientController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
             'direccion' => 'required|string|max:255',
             'frecuencia' => 'required|integer|min:0',
+            'telefono' => 'required|integer|min:0',
             'observacion' => 'nullable|string',
         ]);
 
@@ -153,6 +156,7 @@ class ClientController extends Controller
             $updateUserData = [
                 'name' => $data['name'],
                 'email' => $data['email'],
+                'telefono' => $data['telefono'],
             ];
 
             if (!empty($data['password'])) {

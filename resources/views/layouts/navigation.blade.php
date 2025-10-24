@@ -8,107 +8,108 @@
         </a>
     </li>
 
-    @can('ver roles')
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('roles.index') }}">
+    @if(auth()->user()->can('ver roles') || auth()->user()->can('ver permisos') || auth()->user()->can('ver usuarios'))
+        <li class="nav-group">
+            <a class="nav-link nav-group-toggle" href="#">
                 <svg class="nav-icon">
-                    <use xlink:href="{{ asset('icons/coreui.svg#cil-clipboard') }}"></use>
+                    <use xlink:href="{{ asset('icons/coreui.svg#cil-shield-alt') }}"></use>
                 </svg>
-                {{ __('Roles') }}
+                {{ __('Admin') }}
             </a>
-        </li>
-    @endcan
+            <ul class="nav-group-items">
+                @can('ver roles')
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('roles.index') }}">
+                            <svg class="nav-icon">
+                                <use xlink:href="{{ asset('icons/coreui.svg#cil-clipboard') }}"></use>
+                            </svg>
+                            {{ __('Roles') }}
+                        </a>
+                    </li>
+                @endcan
 
-    @can('ver permisos')
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('permissions.index') }}">
-                <svg class="nav-icon">
-                    <use xlink:href="{{ asset('icons/coreui.svg#cil-lock-locked') }}"></use>
-                    {{-- user-plus --}}
-                </svg>
-                {{ __('Permisos') }}
-            </a>
-        </li>
-    @endcan
+                @can('ver permisos')
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('permissions.index') }}">
+                            <svg class="nav-icon">
+                                <use xlink:href="{{ asset('icons/coreui.svg#cil-lock-locked') }}"></use>
+                            </svg>
+                            {{ __('Permisos') }}
+                        </a>
+                    </li>
+                @endcan
 
-    @can('ver usuarios')
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('users.index') }}">
+                @can('ver usuarios')
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('users.index') }}">
+                            <svg class="nav-icon">
+                                <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
+                            </svg>
+                            {{ __('Usuarios') }}
+                        </a>
+                    </li>
+                @endcan
+            </ul>
+        </li>
+    @endif
+
+    @if(auth()->user()->can('ver clientes') || auth()->user()->can('ver estilistas'))
+        <li class="nav-group">
+            <a class="nav-link nav-group-toggle" href="#">
                 <svg class="nav-icon">
-                    <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
+                    <use xlink:href="{{ asset('icons/coreui.svg#cil-people') }}"></use>
                 </svg>
                 {{ __('Usuarios') }}
             </a>
-        </li>
-    @endcan
+            <ul class="nav-group-items">
+                @can('ver clientes')
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('clients.index') }}">
+                            <svg class="nav-icon">
+                                <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
+                            </svg>
+                            {{ __('Clientes') }}
+                        </a>
+                    </li>
+                @endcan
 
-    @can('ver clientes')
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('clients.index') }}">
-                <svg class="nav-icon">
-                    <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
-                </svg>
-                {{ __('Clientes') }}
-            </a>
+                @can('ver estilistas')
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('estilistas.index') }}">
+                            <svg class="nav-icon">
+                                <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
+                            </svg>
+                            {{ __('Estilistas') }}
+                        </a>
+                    </li>
+                @endcan
+            </ul>
         </li>
-    @endcan
+    @endif
 
     @can('ver horarios')
         <li class="nav-item">
             <a class="nav-link" href="{{ route('horarios.index') }}">
                 <svg class="nav-icon">
-                    <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
+                    <use xlink:href="{{ asset('icons/coreui.svg#cil-calendar') }}"></use>
                 </svg>
                 {{ __('Horarios') }}
             </a>
         </li>
     @endcan
 
-    @can('ver citas')
+    @can('ver herramientas')
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('citas.index') }}">
-                <svg class="nav-icon">
-                    <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
-                </svg>
-                {{ __('Citas') }}
-            </a>
-        </li>
-    @endcan
-
-    @can('ver estilistas')
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('estilistas.index') }}">
-                <svg class="nav-icon">
-                    <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
-                </svg>
-                {{ __('Estilistas') }}
-            </a>
-        </li>
-    @endcan
-
-    @can('ver notificaciones')
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('notificacions.index') }}">
-                <svg class="nav-icon">
-                    <use xlink:href="{{ asset('icons/coreui.svg#cil-user') }}"></use>
-                </svg>
-                {{ __('Notificaciones') }}
-            </a>
-        </li>
-    @endcan
-          
-    {{-- @can('ver libros')
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('books.index') }}">
+            <a class="nav-link" href="{{ route('horarios.index') }}">
                 <svg class="nav-icon">
                     <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
                 </svg>
-                {{ __('Libros') }}
+                {{ __('Herramientas') }}
             </a>
         </li>
-    @endcan --}}
+    @endcan
 
-     @can('bitacora')
+    @can('bitacora')
         <li class="nav-item">
             <a class="nav-link" href="{{ route('bitacora.index') }}">
                 <svg class="nav-icon">

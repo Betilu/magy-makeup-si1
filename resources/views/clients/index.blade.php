@@ -33,6 +33,7 @@
                     <th>Email</th>
                     <th>Dirección</th>
                     <th>Frecuencia</th>
+                    <th>Telefono</th>
                     <th>Observación</th>
                     <th>Acciones</th>
                 </tr>
@@ -45,6 +46,7 @@
                         <td>{{ $client->user->email }}</td>
                         <td>{{ $client->direccion }}</td>
                         <td>{{ $client->frecuencia }}</td>
+                        <td>{{ $client->user->telefono }}</td>
                         <td>{{ $client->observacion ?? '—' }}</td>
                         <td>
                             <a href="{{ route('clients.show', $client) }}" class="btn btn-info btn-sm">Ver</a>
@@ -136,6 +138,16 @@
                             class="form-control @error('frecuencia') is-invalid @enderror" value="{{ old('frecuencia') }}"
                             required>
                         @error('frecuencia')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="modal_telefono" class="form-label">Teléfono</label>
+                        <input type="number" name="telefono" id="modal_telefono"
+                            class="form-control @error('telefono') is-invalid @enderror" value="{{ old('telefono') }}"
+                            required>
+                        @error('telefono')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

@@ -53,6 +53,14 @@
             @enderror
         </div>
 
+         <div class="mb-3">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input type="number" name="telefono" id="telefono" class="form-control @error('telefono') is-invalid @enderror" value="{{ old('telefono', $client->user->telefono) }}" required>
+            @error('telefono')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
         <div class="mb-3">
             <label for="observacion" class="form-label">Observación</label>
             <textarea name="observacion" id="observacion" class="form-control">{{ old('observacion', $client->observacion) }}</textarea>
