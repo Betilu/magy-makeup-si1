@@ -32,7 +32,7 @@ class UserSeeder extends Seeder
         $adminUser = User::query()->create([
             'name' => 'admin',
             'email' => 'admin@gmail.com',
-            'password' => '12345',
+            'password' => 'admin',
             'email_verified_at' => now()
         ]);
 

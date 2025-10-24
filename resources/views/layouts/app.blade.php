@@ -9,7 +9,7 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
      {{-- ✅ Agrega aquí el CSS de Bootstrap --}}
-    {{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <meta name="theme-color" content="#ffffff">
     @vite('resources/sass/app.scss')
@@ -123,7 +123,7 @@
     <script src="{{ asset('js/coreui.bundle.min.js') }}"></script>
 
     {{-- ✅ Agrega aquí el JS de Bootstrap antes de cerrar el body --}}
-    {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> --}}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
