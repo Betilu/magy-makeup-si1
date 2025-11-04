@@ -67,5 +67,23 @@ Route::middleware('auth')->group(function () {
      // Rutas de notificaciones
     Route::resource('notificacions', NotificacionController::class);
 
+    // Rutas de productos
+    Route::resource('productos', \App\Http\Controllers\ProductoController::class);
+
+    // Rutas de promociones
+    Route::resource('promocions', \App\Http\Controllers\PromocionController::class);
+
+    // Rutas de servicios
+    Route::resource('servicios', \App\Http\Controllers\ServicioController::class);
+
+    // Rutas de asignación producto-servicio
+    Route::resource('servicio_productos', \App\Http\Controllers\ServicioProductoController::class);
+
+    // Rutas de asignación promocion-servicio
+    Route::resource('promocion_servicios', \App\Http\Controllers\PromocionServicioController::class);
+
+    // Rutas de asignación herramienta-estilista
+    Route::resource('asignacion_herramientas', \App\Http\Controllers\AsignacionHerramientaController::class);
+
     Route::resource('books', BookController::class)->only('index');
 });
