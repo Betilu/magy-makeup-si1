@@ -1,190 +1,203 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Productos</h1>
-        <!-- Botón para abrir modal Crear -->
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProductModal">Crear producto</button>
-    </div>
+<div class="container-fluid">
+    <div class="card" style="border:none; border-radius:15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div class="card-header" style="background: linear-gradient(135deg, #662d91 0%, #662a5b 100%); color:white; border-radius:15px 15px 0 0; padding:1.25rem;">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0" style="font-weight:600;">
+                    <svg class="icon me-2" style="width:20px; height:20px;">
+                        <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+                    </svg>
+                    Gestión de Productos
+                </h4>
+                @can('crear productos')
+                    <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#createProductModal" style="border-radius:8px; font-weight:500;">
+                        <svg class="icon me-1"><use xlink:href="{{ asset('icons/coreui.svg#cil-plus') }}"></use></svg>
+                        Nuevo Producto
+                    </button>
+                @endcan
+            </div>
+        </div>
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+        <div class="card-body" style="padding:1.5rem;">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius:10px; border-left:4px solid #28a745;">
+                    <svg class="icon me-2"><use xlink:href="{{ asset('icons/coreui.svg#cil-check-circle') }}"></use></svg>
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
 
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Categoría</th>
-                    <th>Nombre</th>
-                    <th>Marca</th>
-                    <th>Precio</th>
-                    <th>Stock</th>
-                    <th>Stock Mín</th>
-                    <th>Vencimiento</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($productos as $producto)
-                    <tr>
-                        <td>{{ $producto->cateogoria }}</td>
-                        <td>{{ $producto->nombre }}</td>
-                        <td>{{ $producto->marca }}</td>
-                        <td>{{ $producto->precio }}</td>
-                        <td>{{ $producto->stockActual }}</td>
-                        <td>{{ $producto->stockMin }}</td>
-                        <td>{{ optional($producto->fechaVencimiento)->format('Y-m-d') }}</td>
-                        <td>
-                            <button class="btn btn-sm btn-info btn-show" type="button" data-product='@json($producto)'>Ver</button>
-                            <button class="btn btn-sm btn-warning btn-edit" type="button" data-product='@json($producto)'>Editar</button>
-                            <form action="{{ route('productos.destroy', $producto) }}" method="POST" style="display:inline-block" onsubmit="return confirm('¿Eliminar este producto?')">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-sm btn-danger">Eliminar</button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="8">No hay productos registrados.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+            <div class="table-responsive">
+                <table class="table table-hover" style="border-radius:8px; overflow:hidden;">
+                    <thead style="background-color:#f8f9fa;">
+                        <tr>
+                            <th style="font-weight:600;">Categoría</th>
+                            <th style="font-weight:600;">Nombre</th>
+                            <th style="font-weight:600;">Marca</th>
+                            <th style="font-weight:600;">Precio</th>
+                            <th style="font-weight:600;">Stock</th>
+                            <th style="font-weight:600;">Vencimiento</th>
+                            <th style="text-align:center; font-weight:600;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($productos as $producto)
+                            <tr>
+                                <td>{{ $producto->cateogoria }}</td>
+                                <td>{{ $producto->nombre }}</td>
+                                <td>{{ $producto->marca }}</td>
+                                <td>{{ $producto->precio }}</td>
+                                <td>{{ $producto->stockActual }}</td>
+                                <td>{{ optional($producto->fechaVencimiento)->format('Y-m-d') }}</td>
+                                <td style="text-align:center;">
+                                    @can('ver productos')
+                                        <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#showModal{{ $producto->id }}">
+                                            <svg class="icon me-1"><use xlink:href="{{ asset('icons/coreui.svg#cil-eye') }}"></use></svg>
+                                            Ver
+                                        </button>
+                                    @endcan
 
-    <div class="mt-3">
-        {{ $productos->links() }}
+                                    @can('editar productos')
+                                        <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#editModal{{ $producto->id }}">
+                                            <svg class="icon me-1"><use xlink:href="{{ asset('icons/coreui.svg#cil-pencil') }}"></use></svg>
+                                            Editar
+                                        </button>
+                                    @endcan
+
+                                    @can('eliminar productos')
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $producto->id }}">
+                                            <svg class="icon me-1"><use xlink:href="{{ asset('icons/coreui.svg#cil-trash') }}"></use></svg>
+                                            Eliminar
+                                        </button>
+                                    @endcan
+                                </td>
+                            </tr>
+
+                            <!-- Modal Ver -->
+                            @can('ver productos')
+                            <div class="modal fade" id="showModal{{ $producto->id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header" style="background:#f8f9fa;">
+                                            <h5 class="modal-title">Detalle Producto</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p><strong>Categoría:</strong> {{ $producto->cateogoria }}</p>
+                                            <p><strong>Nombre:</strong> {{ $producto->nombre }}</p>
+                                            <p><strong>Marca:</strong> {{ $producto->marca }}</p>
+                                            <p><strong>Precio:</strong> {{ $producto->precio }}</p>
+                                            <p><strong>Stock actual:</strong> {{ $producto->stockActual }}</p>
+                                            <p><strong>Stock mínimo:</strong> {{ $producto->stockMin }}</p>
+                                            <p><strong>Fecha de vencimiento:</strong> {{ optional($producto->fechaVencimiento)->format('Y-m-d') }}</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endcan
+
+                            <!-- Modal Editar -->
+                            @can('editar productos')
+                            <div class="modal fade" id="editModal{{ $producto->id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <form action="{{ route('productos.update', $producto) }}" method="POST">
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="modal-header" style="background:#f8f9fa;">
+                                                <h5 class="modal-title">Editar Producto</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                @include('productos._form')
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-primary">Guardar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            @endcan
+
+                            <!-- Modal Eliminar -->
+                            @can('eliminar productos')
+                            <div class="modal fade" id="deleteModal{{ $producto->id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Confirmar eliminación</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ¿Deseas eliminar el producto <strong>{{ $producto->nombre }}</strong>?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <form action="{{ route('productos.destroy', $producto) }}" method="POST" style="display:inline-block;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endcan
+
+                        @empty
+                            <tr>
+                                <td colspan="7">No hay productos registrados.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-3">
+                {{ $productos->links() }}
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- Modal Crear Producto -->
-<div class="modal fade" id="createProductModal" tabindex="-1" aria-labelledby="createProductModalLabel" aria-hidden="true">
+@can('crear productos')
+<div class="modal fade" id="createProductModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createProductModalLabel">Crear producto</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="createProductForm" action="{{ route('productos.store') }}" method="POST">
-                        @csrf
-                        @include('productos._form')
-                        <div class="mt-3 text-end">
-                                <button class="btn btn-primary">Crear</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        </div>
-                </form>
-            </div>
+            <form action="{{ route('productos.store') }}" method="POST">
+                @csrf
+                <div class="modal-header" style="background:#f8f9fa;">
+                    <h5 class="modal-title">Nuevo Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    @include('productos._form')
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+@endcan
 
-<!-- Modal Editar Producto -->
-<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editProductModalLabel">Editar producto</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editProductForm" action="" method="POST">
-                        @csrf
-                        @method('PUT')
-                        @include('productos._form')
-                        <div class="mt-3 text-end">
-                                <button class="btn btn-primary">Guardar</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Mostrar Producto -->
-<div class="modal fade" id="showProductModal" tabindex="-1" aria-labelledby="showProductModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="showProductModalLabel">Detalle producto</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="showProductBody">
-                <!-- Contenido llenado por JS -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-@push('scripts')
+@if ($errors->any())
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Handler para Edit
-    document.querySelectorAll('.btn-edit').forEach(function(btn){
-        btn.addEventListener('click', function(){
-            const product = JSON.parse(this.getAttribute('data-product'));
-            const editModal = document.getElementById('editProductModal');
-            const form = document.getElementById('editProductForm');
-            form.action = '/productos/' + product.id;
-            
-            // populate fields using querySelector within modal
-            editModal.querySelector('.producto-cateogoria').value = product.cateogoria ?? '';
-            editModal.querySelector('.producto-nombre').value = product.nombre ?? '';
-            editModal.querySelector('.producto-marca').value = product.marca ?? '';
-            editModal.querySelector('.producto-precio').value = product.precio ?? '';
-            editModal.querySelector('.producto-stockActual').value = product.stockActual ?? '';
-            editModal.querySelector('.producto-stockMin').value = product.stockMin ?? '';
-            
-            // fecha - try to extract date part
-            let fecha = product.fechaVencimiento ?? null;
-            if(fecha){
-                // fecha might be '2025-11-04T00:00:00.000000Z' or '2025-11-04'
-                const d = new Date(fecha);
-                if(!isNaN(d)){
-                    const yyyy = d.getFullYear();
-                    const mm = String(d.getMonth()+1).padStart(2,'0');
-                    const dd = String(d.getDate()).padStart(2,'0');
-                    editModal.querySelector('.producto-fechaVencimiento').value = `${yyyy}-${mm}-${dd}`;
-                } else {
-                    editModal.querySelector('.producto-fechaVencimiento').value = fecha;
-                }
-            } else {
-                editModal.querySelector('.producto-fechaVencimiento').value = '';
-            }
-
-            // show modal
-            var modalInstance = new bootstrap.Modal(editModal);
-            modalInstance.show();
-        });
+    document.addEventListener('DOMContentLoaded', function() {
+        var createModal = new bootstrap.Modal(document.getElementById('createProductModal'));
+        createModal.show();
     });
-
-    // Handler para Show
-    document.querySelectorAll('.btn-show').forEach(function(btn){
-        btn.addEventListener('click', function(){
-            const product = JSON.parse(this.getAttribute('data-product'));
-            const body = document.getElementById('showProductBody');
-            body.innerHTML = `
-                <p><strong>Categoría:</strong> ${product.cateogoria ?? ''}</p>
-                <p><strong>Nombre:</strong> ${product.nombre ?? ''}</p>
-                <p><strong>Marca:</strong> ${product.marca ?? ''}</p>
-                <p><strong>Precio:</strong> ${product.precio ?? ''}</p>
-                <p><strong>Stock actual:</strong> ${product.stockActual ?? ''}</p>
-                <p><strong>Stock mínimo:</strong> ${product.stockMin ?? ''}</p>
-                <p><strong>Fecha de vencimiento:</strong> ${product.fechaVencimiento ? (new Date(product.fechaVencimiento)).toISOString().split('T')[0] : ''}</p>
-            `;
-            var showModal = new bootstrap.Modal(document.getElementById('showProductModal'));
-            showModal.show();
-        });
-    });
-});
 </script>
-@endpush
+@endif
 
 @endsection
