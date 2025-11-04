@@ -5,6 +5,7 @@
     <h1>Crear producto</h1>
 
     <form action="{{ route('productos.store') }}" method="POST">
+        @csrf
         @include('productos._form')
 
         <button class="btn btn-primary">Crear</button>

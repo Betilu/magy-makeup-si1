@@ -130,6 +130,16 @@
         </ul>
     </li>
 
+    @can('ver productos')
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('productos.index') }}">
+                <svg class="nav-icon">
+                    <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+                </svg>
+                {{ __('Productos') }}
+            </a>
+        </li>
+    @endcan
 
 
 
