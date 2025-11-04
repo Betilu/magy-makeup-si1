@@ -1,5 +1,3 @@
-@csrf
-
 <div class="mb-3">
     <label for="cateogoria" class="form-label">Categoría</label>
     <input type="text" name="cateogoria" id="cateogoria" class="form-control" value="{{ old('cateogoria', $producto->cateogoria ?? '') }}">
