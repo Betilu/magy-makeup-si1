@@ -126,60 +126,63 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-        // Handler para Edit
-        document.querySelectorAll('.btn-edit').forEach(function(btn){
-                btn.addEventListener('click', function(){
-                        const product = JSON.parse(this.getAttribute('data-product'));
-                        const form = document.getElementById('editProductForm');
-                        form.action = '/productos/' + product.id;
-                        // populate fields
-                        document.getElementById('cateogoria').value = product.cateogoria ?? '';
-                        document.getElementById('nombre').value = product.nombre ?? '';
-                        document.getElementById('marca').value = product.marca ?? '';
-                        document.getElementById('precio').value = product.precio ?? '';
-                        document.getElementById('stockActual').value = product.stockActual ?? '';
-                        document.getElementById('stockMin').value = product.stockMin ?? '';
-                        // fecha - try to extract date part
-                        let fecha = product.fechaVencimiento ?? null;
-                        if(fecha){
-                                // fecha might be '2025-11-04T00:00:00.000000Z' or '2025-11-04'
-                                const d = new Date(fecha);
-                                if(!isNaN(d)){
-                                        const yyyy = d.getFullYear();
-                                        const mm = String(d.getMonth()+1).padStart(2,'0');
-                                        const dd = String(d.getDate()).padStart(2,'0');
-                                        document.getElementById('fechaVencimiento').value = `${yyyy}-${mm}-${dd}`;
-                                } else {
-                                        document.getElementById('fechaVencimiento').value = fecha;
-                                }
-                        } else {
-                                document.getElementById('fechaVencimiento').value = '';
-                        }
+    // Handler para Edit
+    document.querySelectorAll('.btn-edit').forEach(function(btn){
+        btn.addEventListener('click', function(){
+            const product = JSON.parse(this.getAttribute('data-product'));
+            const editModal = document.getElementById('editProductModal');
+            const form = document.getElementById('editProductForm');
+            form.action = '/productos/' + product.id;
+            
+            // populate fields using querySelector within modal
+            editModal.querySelector('.producto-cateogoria').value = product.cateogoria ?? '';
+            editModal.querySelector('.producto-nombre').value = product.nombre ?? '';
+            editModal.querySelector('.producto-marca').value = product.marca ?? '';
+            editModal.querySelector('.producto-precio').value = product.precio ?? '';
+            editModal.querySelector('.producto-stockActual').value = product.stockActual ?? '';
+            editModal.querySelector('.producto-stockMin').value = product.stockMin ?? '';
+            
+            // fecha - try to extract date part
+            let fecha = product.fechaVencimiento ?? null;
+            if(fecha){
+                // fecha might be '2025-11-04T00:00:00.000000Z' or '2025-11-04'
+                const d = new Date(fecha);
+                if(!isNaN(d)){
+                    const yyyy = d.getFullYear();
+                    const mm = String(d.getMonth()+1).padStart(2,'0');
+                    const dd = String(d.getDate()).padStart(2,'0');
+                    editModal.querySelector('.producto-fechaVencimiento').value = `${yyyy}-${mm}-${dd}`;
+                } else {
+                    editModal.querySelector('.producto-fechaVencimiento').value = fecha;
+                }
+            } else {
+                editModal.querySelector('.producto-fechaVencimiento').value = '';
+            }
 
-                        // show modal
-                        var editModal = new bootstrap.Modal(document.getElementById('editProductModal'));
-                        editModal.show();
-                });
+            // show modal
+            var modalInstance = new bootstrap.Modal(editModal);
+            modalInstance.show();
         });
+    });
 
-        // Handler para Show
-        document.querySelectorAll('.btn-show').forEach(function(btn){
-                btn.addEventListener('click', function(){
-                        const product = JSON.parse(this.getAttribute('data-product'));
-                        const body = document.getElementById('showProductBody');
-                        body.innerHTML = `
-                                <p><strong>Categoría:</strong> ${product.cateogoria ?? ''}</p>
-                                <p><strong>Nombre:</strong> ${product.nombre ?? ''}</p>
-                                <p><strong>Marca:</strong> ${product.marca ?? ''}</p>
-                                <p><strong>Precio:</strong> ${product.precio ?? ''}</p>
-                                <p><strong>Stock actual:</strong> ${product.stockActual ?? ''}</p>
-                                <p><strong>Stock mínimo:</strong> ${product.stockMin ?? ''}</p>
-                                <p><strong>Fecha de vencimiento:</strong> ${product.fechaVencimiento ? (new Date(product.fechaVencimiento)).toISOString().split('T')[0] : ''}</p>
-                        `;
-                        var showModal = new bootstrap.Modal(document.getElementById('showProductModal'));
-                        showModal.show();
-                });
+    // Handler para Show
+    document.querySelectorAll('.btn-show').forEach(function(btn){
+        btn.addEventListener('click', function(){
+            const product = JSON.parse(this.getAttribute('data-product'));
+            const body = document.getElementById('showProductBody');
+            body.innerHTML = `
+                <p><strong>Categoría:</strong> ${product.cateogoria ?? ''}</p>
+                <p><strong>Nombre:</strong> ${product.nombre ?? ''}</p>
+                <p><strong>Marca:</strong> ${product.marca ?? ''}</p>
+                <p><strong>Precio:</strong> ${product.precio ?? ''}</p>
+                <p><strong>Stock actual:</strong> ${product.stockActual ?? ''}</p>
+                <p><strong>Stock mínimo:</strong> ${product.stockMin ?? ''}</p>
+                <p><strong>Fecha de vencimiento:</strong> ${product.fechaVencimiento ? (new Date(product.fechaVencimiento)).toISOString().split('T')[0] : ''}</p>
+            `;
+            var showModal = new bootstrap.Modal(document.getElementById('showProductModal'));
+            showModal.show();
         });
+    });
 });
 </script>
 @endpush
