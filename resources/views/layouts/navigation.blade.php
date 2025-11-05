@@ -196,6 +196,28 @@
         </li>
     @endcan
 
+    @can('ver citas')
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('citas.index') }}">
+                <svg class="nav-icon">
+                    <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+                </svg>
+                {{ __('Citas') }}
+            </a>
+        </li>
+    @endcan
+
+     @can('ver notificaciones')
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('notificacions.index') }}">
+                <svg class="nav-icon">
+                    <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+                </svg>
+                {{ __('Notificaciones') }}
+            </a>
+        </li>
+    @endcan
+
     
 
 </ul>
