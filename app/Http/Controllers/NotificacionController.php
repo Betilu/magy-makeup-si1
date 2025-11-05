@@ -45,11 +45,8 @@ class NotificacionController extends Controller
             'estado' => 'required|string',
             'fecha' => 'required|string',
             'mensaje' => 'required|string',
+            'client_id' => 'required|exists:clients,id', // Agregado para recibir el client_id del formulario
         ]);
-
-        // Asegurarse que client_id venga desde la cita seleccionada (evita manipulación desde el cliente)
-        $cita = Cita::findOrFail($validated['cita_id']);
-        $validated['client_id'] = $cita->client_id;
 
         Notificacion::create($validated);
         return redirect()->route('notificacions.index')->with('success', 'Notificación creada correctamente');
