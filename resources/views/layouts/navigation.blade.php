@@ -176,7 +176,7 @@
 
     @can('ver servicio productos')
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('servicios_productos.index') }}">
+            <a class="nav-link" href="{{ route('servicio_productos.index') }}">
                 <svg class="nav-icon">
                     <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
                 </svg>
