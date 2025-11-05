@@ -2,11 +2,15 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
-    <h1 class="h3 mb-4">Editar Notificación</h1>
-    <form action="{{ route('notificacions.update', $notificacion->id) }}" method="POST" class="bg-white p-4 rounded shadow-sm">
-        @csrf
-        @method('PUT')
+<div class="container-fluid">
+    <div class="card" style="border:none; border-radius:15px; box-shadow: 0 4px 6px rgba(0,0,0,0.06);">
+        <div class="card-header" style="background: linear-gradient(135deg, #662d91 0%, #662a5b 100%); color:white; border-radius:15px 15px 0 0; padding:1.25rem;">
+            <h4 class="mb-0" style="font-weight:600;">Editar Notificación</h4>
+        </div>
+        <div class="card-body" style="padding:1.5rem;">
+            <form action="{{ route('notificacions.update', $notificacion->id) }}" method="POST" class="bg-white p-4 rounded shadow-sm">
+                @csrf
+                @method('PUT')
         @php
             $clients = App\Models\Client::with('user')->get()->sortBy(function($c){
                 return strtolower($c->user->name ?? '');
@@ -64,8 +68,12 @@
                 <div class="text-danger small">{{ $message }}</div>
             @enderror
         </div>
-        <button type="submit" class="btn btn-warning text-white">Actualizar</button>
-        <a href="{{ route('notificacions.index') }}" class="btn btn-secondary ms-2">Cancelar</a>
-    </form>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn text-white" style="background-color:#662a5b;">Actualizar</button>
+                    <a href="{{ route('notificacions.index') }}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 @endsection

@@ -2,10 +2,17 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
-    <h1 class="h3 mb-4">Nueva Notificación</h1>
-    <form action="{{ route('notificacions.store') }}" method="POST" class="bg-white p-4 rounded shadow-sm">
-        @csrf
+<div class="container-fluid">
+    <div class="card" style="border:none; border-radius:15px; box-shadow: 0 4px 6px rgba(0,0,0,0.06);">
+        <div class="card-header" style="background: linear-gradient(135deg, #662d91 0%, #662a5b 100%); color:white; border-radius:15px 15px 0 0; padding:1.25rem;">
+            <h4 class="mb-0" style="font-weight:600;">
+                <svg class="icon me-2" style="width:20px; height:20px;"><use xlink:href="{{ asset('icons/coreui.svg#cil-plus') }}"></use></svg>
+                Nueva Notificación
+            </h4>
+        </div>
+        <div class="card-body" style="padding:1.5rem;">
+            <form action="{{ route('notificacions.store') }}" method="POST" class="bg-white p-4 rounded shadow-sm">
+                @csrf
         {{-- Mostrar una lista de citas como radios con el nombre del cliente y el id de la cita. --}}
         <div class="mb-3">
             <label class="form-label">Seleccionar cita</label>
@@ -69,9 +76,13 @@
                 <div class="text-danger small">{{ $message }}</div>
             @enderror
         </div>
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        <a href="{{ route('notificacions.index') }}" class="btn btn-secondary ms-2">Cancelar</a>
-    </form>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn text-white" style="background-color:#662a5b;">Guardar</button>
+                    <a href="{{ route('notificacions.index') }}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 @endsection
 
