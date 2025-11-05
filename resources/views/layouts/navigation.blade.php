@@ -133,7 +133,7 @@
                         <svg class="nav-icon">
                             <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
                         </svg>
-                        {{ __('Herramientas') }}
+                        {{ __('Asignacion Herramientas') }}
                     </a>
                 </li>
             @endcan    
