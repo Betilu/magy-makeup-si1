@@ -1,0 +1,67 @@
+/* Estilos personalizados para el sidebar de MAGY MAKEUP */
+
+/* Hover effects para nav-link */
+.sidebar-nav .nav-link:hover {
+    background-color: rgba(230, 179, 204, 0.15) !important;
+    transform: translateX(4px);
+}
+
+/* Active state */
+.sidebar-nav .nav-link.active {
+    background-color: rgba(230, 179, 204, 0.25) !important;
+    border-left: 3px solid #e6b3cc;
+}
+
+/* Grupo de navegación hover */
+.sidebar-nav .nav-group-toggle:hover {
+    background-color: rgba(230, 179, 204, 0.15) !important;
+}
+
+/* Animación suave para iconos */
+.sidebar-nav .nav-icon {
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.sidebar-nav .nav-link:hover .nav-icon {
+    transform: scale(1.1);
+    color: #e6b3cc !important;
+}
+
+/* Estilo para items de submenú */
+.sidebar-nav .nav-group-items .nav-link {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.sidebar-nav .nav-group-items .nav-link:hover {
+    opacity: 1;
+}
+
+/* Efecto de apertura del grupo */
+.sidebar-nav .nav-group.show > .nav-group-toggle {
+    background-color: rgba(230, 179, 204, 0.2) !important;
+}
+
+/* Scrollbar personalizado */
+.sidebar-nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: rgba(230, 179, 204, 0.3);
+    border-radius: 3px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(230, 179, 204, 0.5);
+}
+
+/* Separador visual entre grupos */
+.sidebar-nav .nav-group + .nav-group {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 0.5rem;
+}

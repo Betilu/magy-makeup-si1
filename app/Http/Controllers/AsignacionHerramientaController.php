@@ -25,7 +25,7 @@ class AsignacionHerramientaController extends Controller
     public function create()
     {
         $herramientas = HerramientaModel::orderBy('nombre')->get();
-        $estilistas = EstilistaModel::orderBy('nombre')->get();
+        $estilistas = EstilistaModel::with('user')->get()->sortBy('user.name');
         $recepcionistas = UserModel::orderBy('name')->get();
 
         return view('asignacion_herramientas.create', compact('herramientas', 'estilistas', 'recepcionistas'));
@@ -67,7 +67,7 @@ class AsignacionHerramientaController extends Controller
     {
         $item = AsignacionHerramientaModel::findOrFail($id);
         $herramientas = HerramientaModel::orderBy('nombre')->get();
-        $estilistas = EstilistaModel::orderBy('nombre')->get();
+        $estilistas = EstilistaModel::with('user')->get()->sortBy('user.name');
         $recepcionistas = UserModel::orderBy('name')->get();
 
         return view('asignacion_herramientas.edit', compact('item', 'herramientas', 'estilistas', 'recepcionistas'));
