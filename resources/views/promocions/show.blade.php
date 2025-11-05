@@ -1,9 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="card">
-        <div class="card-header">Detalle de Promoción</div>
+<div class="container-fluid">
+    <div class="card" style="border:none; border-radius:15px; box-shadow: 0 4px 6px rgba(0,0,0,0.08);">
+        <div class="card-header" style="background: linear-gradient(135deg, #662d91 0%, #662a5b 100%); color:white; border-radius:15px 15px 0 0; padding:1.25rem;">
+            <h4 class="mb-0" style="font-weight:600;">
+                <svg class="icon me-2" style="width:28px; height:28px;"><use xlink:href="{{ asset('icons/coreui.svg#cil-gift') }}"></use></svg>
+                Detalle de Promoción
+            </h4>
+        </div>
         <div class="card-body">
             <dl class="row">
                 <dt class="col-3">Nombre</dt>
