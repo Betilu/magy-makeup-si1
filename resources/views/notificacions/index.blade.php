@@ -90,9 +90,17 @@
                                         @method('PUT')
                                         @csrf
                                         <div class="modal-body">
+                                            @php $clients = App\Models\Client::orderBy('nombre')->get(); @endphp
                                             <div class="mb-3">
-                                                <label class="form-label">Cliente (ID)</label>
-                                                <input type="text" name="client_id" value="{{ old('client_id', $notificacion->client_id) }}" class="form-control">
+                                                <label class="form-label">Cliente</label>
+                                                <div>
+                                                    @foreach($clients as $client)
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="client_id" id="client_edit_{{ $notificacion->id }}_{{ $client->id }}" value="{{ $client->id }}" {{ (old('client_id', $notificacion->client_id) == $client->id) ? 'checked' : '' }}>
+                                                            <label class="form-check-label" for="client_edit_{{ $notificacion->id }}_{{ $client->id }}">{{ $client->nombre ?? $client->name }}</label>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Cita (ID)</label>
@@ -167,9 +175,17 @@
                 <form action="{{ route('notificacions.store') }}" method="post">
                     @csrf
                     <div class="modal-body">
+                        @php $clients = App\Models\Client::orderBy('nombre')->get(); @endphp
                         <div class="mb-3">
-                            <label class="form-label">Cliente (ID)</label>
-                            <input type="text" name="client_id" value="{{ old('client_id') }}" class="form-control">
+                            <label class="form-label">Cliente</label>
+                            <div>
+                                @foreach($clients as $client)
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="client_id" id="client_create_{{ $client->id }}" value="{{ $client->id }}" {{ old('client_id') == $client->id ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="client_create_{{ $client->id }}">{{ $client->nombre ?? $client->name }}</label>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Cita (ID)</label>

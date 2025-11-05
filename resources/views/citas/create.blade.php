@@ -6,9 +6,17 @@
     <h1 class="h3 mb-4">Nueva Cita</h1>
     <form action="{{ route('citas.store') }}" method="POST" class="bg-white p-4 rounded shadow-sm">
         @csrf
+        @php $users = App\Models\User::orderBy('name')->get(); @endphp
         <div class="mb-3">
-            <label class="form-label">Usuario (ID)</label>
-            <input type="number" name="user_id" class="form-control" required>
+            <label class="form-label">Usuario</label>
+            <div>
+                @foreach($users as $user)
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="user_id" id="user_{{ $user->id }}" value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'checked' : '' }}>
+                        <label class="form-check-label" for="user_{{ $user->id }}">{{ $user->name }}{{ isset($user->email) ? ' - '.$user->email : '' }}</label>
+                    </div>
+                @endforeach
+            </div>
             @error('user_id')
                 <div class="text-danger small">{{ $message }}</div>
             @enderror
