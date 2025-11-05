@@ -57,7 +57,7 @@ class NotificacionController extends Controller
      */
     public function show(string $id)
     {
-        $notificacion = Notificacion::findOrFail($id);
+        $notificacion = Notificacion::with('client.user', 'cita.user')->findOrFail($id);
         return view('notificacions.show', compact('notificacion'));
     }
 
@@ -66,7 +66,7 @@ class NotificacionController extends Controller
      */
     public function edit(string $id)
     {
-        $notificacion = Notificacion::findOrFail($id);
+        $notificacion = Notificacion::with('client.user', 'cita.user')->findOrFail($id);
         return view('notificacions.edit', compact('notificacion'));
     }
 

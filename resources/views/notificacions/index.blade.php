@@ -94,6 +94,7 @@
                                                 $clients = App\Models\Client::with('user')->get()->sortBy(function($c){
                                                     return strtolower($c->user->name ?? '');
                                                 });
+                                                $citas = App\Models\Cita::with('user')->get();
                                             @endphp
                                             <div class="mb-3">
                                                 <label class="form-label">Cliente</label>
@@ -107,8 +108,17 @@
                                                 </div>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label">Cita (ID)</label>
-                                                <input type="text" name="cita_id" value="{{ old('cita_id', $notificacion->cita_id) }}" class="form-control">
+                                                <label class="form-label">Cita</label>
+                                                <div>
+                                                    @foreach($citas as $cita)
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="cita_id" id="cita_edit_{{ $notificacion->id }}_{{ $cita->id }}" value="{{ $cita->id }}" {{ (old('cita_id', $notificacion->cita_id) == $cita->id) ? 'checked' : '' }}>
+                                                            <label class="form-check-label" for="cita_edit_{{ $notificacion->id }}_{{ $cita->id }}">
+                                                                Cita #{{ $cita->id }} - {{ $cita->user->name ?? 'Usuario #'.$cita->user_id }} - {{ $cita->fecha }} {{ $cita->hora }}
+                                                            </label>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Estado</label>
@@ -183,6 +193,7 @@
                             $clients = App\Models\Client::with('user')->get()->sortBy(function($c){
                                 return strtolower($c->user->name ?? '');
                             });
+                            $citas = App\Models\Cita::with('user')->get();
                         @endphp
                         <div class="mb-3">
                             <label class="form-label">Cliente</label>
@@ -196,8 +207,17 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Cita (ID)</label>
-                            <input type="text" name="cita_id" value="{{ old('cita_id') }}" class="form-control">
+                            <label class="form-label">Cita</label>
+                            <div>
+                                @foreach($citas as $cita)
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="cita_id" id="cita_create_{{ $cita->id }}" value="{{ $cita->id }}" {{ old('cita_id') == $cita->id ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="cita_create_{{ $cita->id }}">
+                                            Cita #{{ $cita->id }} - {{ $cita->user->name ?? 'Usuario #'.$cita->user_id }} - {{ $cita->fecha }} {{ $cita->hora }}
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Estado</label>
