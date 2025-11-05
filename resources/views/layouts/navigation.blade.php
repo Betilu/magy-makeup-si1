@@ -114,7 +114,7 @@
             <svg class="nav-icon">
                 <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
             </svg>
-            {{ __('G.Herramientas') }}
+            {{ __('G.Inventario y Herramientas') }}
         </a>
         <ul class="nav-group-items">
             @can('ver herramientas')
@@ -136,88 +136,110 @@
                         {{ __('Asignacion Herramientas') }}
                     </a>
                 </li>
-            @endcan    
+            @endcan
+            @can('ver productos')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('productos.index') }}">
+                        <svg class="nav-icon">
+                            <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+                        </svg>
+                        {{ __('Productos') }}
+                    </a>
+                </li>
+            @endcan
 
         </ul>
     </li>
 
-    @can('ver productos')
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('productos.index') }}">
-                <svg class="nav-icon">
-                    <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
-                </svg>
-                {{ __('Productos') }}
-            </a>
-        </li>
-    @endcan
+    <li class="nav-group">
+        <a class="nav-link nav-group-toggle" href="#">
+            <svg class="nav-icon">
+                <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+            </svg>
+            {{ __('G.Servicios y Citas') }}
+        </a>
+        <ul class="nav-group-items">
 
-    @can('ver promociones')
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('promocions.index') }}">
-                <svg class="nav-icon">
-                    <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
-                </svg>
-                {{ __('Promociones') }}
-            </a>
-        </li>
-    @endcan
+            @can('ver servicios')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('servicios.index') }}">
+                        <svg class="nav-icon">
+                            <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+                        </svg>
+                        {{ __('Servicios') }}
+                    </a>
+                </li>
+            @endcan
 
-    @can('ver servicios')
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('servicios.index') }}">
-                <svg class="nav-icon">
-                    <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
-                </svg>
-                {{ __('Servicios') }}
-            </a>
-        </li>
-    @endcan
+            @can('ver servicio productos')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('servicio_productos.index') }}">
+                        <svg class="nav-icon">
+                            <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+                        </svg>
+                        {{ __('Servicios Productos') }}
+                    </a>
+                </li>
+            @endcan
 
-    @can('ver servicio productos')
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('servicio_productos.index') }}">
-                <svg class="nav-icon">
-                    <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
-                </svg>
-                {{ __('Servicios Productos') }}
-            </a>
-        </li>
-    @endcan
+            @can('ver citas')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('citas.index') }}">
+                        <svg class="nav-icon">
+                            <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+                        </svg>
+                        {{ __('Citas') }}
+                    </a>
+                </li>
+            @endcan
 
-    @can('ver promocion servicios')
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('promocion_servicios.index') }}">
-                <svg class="nav-icon">
-                    <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
-                </svg>
-                {{ __('Promocion Servicios') }}
-            </a>
-        </li>
-    @endcan
+            @can('ver notificaciones')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('notificacions.index') }}">
+                        <svg class="nav-icon">
+                            <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+                        </svg>
+                        {{ __('Notificaciones') }}
+                    </a>
+                </li>
+            @endcan
 
-    @can('ver citas')
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('citas.index') }}">
-                <svg class="nav-icon">
-                    <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
-                </svg>
-                {{ __('Citas') }}
-            </a>
-        </li>
-    @endcan
+        </ul>
+    </li>
 
-     @can('ver notificaciones')
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('notificacions.index') }}">
-                <svg class="nav-icon">
-                    <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
-                </svg>
-                {{ __('Notificaciones') }}
-            </a>
-        </li>
-    @endcan
+    <li class="nav-group">
+        <a class="nav-link nav-group-toggle" href="#">
+            <svg class="nav-icon">
+                <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+            </svg>
+            {{ __('G.Promocion y Comunicacion') }}
+        </a>
+        <ul class="nav-group-items">
 
-    
+            @can('ver promociones')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('promocions.index') }}">
+                        <svg class="nav-icon">
+                            <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+                        </svg>
+                        {{ __('Promociones') }}
+                    </a>
+                </li>
+            @endcan
+
+            @can('ver promocion servicios')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('promocion_servicios.index') }}">
+                        <svg class="nav-icon">
+                            <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+                        </svg>
+                        {{ __('Promocion Servicios') }}
+                    </a>
+                </li>
+            @endcan
+           
+        </ul>
+    </li>
+
 
 </ul>
