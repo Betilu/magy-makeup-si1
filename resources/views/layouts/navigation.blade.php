@@ -14,7 +14,7 @@
                 <svg class="nav-icon" style="color:#e6b3cc;">
                     <use xlink:href="{{ asset('icons/coreui.svg#cil-shield-alt') }}"></use>
                 </svg>
-                {{ __('G.Usuarios y Seguridad') }}
+                {{ __('Usuarios-Seguridad') }}
             </a>
             <ul class="nav-group-items" style="padding-left:0.5rem;">
                 @can('ver roles')
@@ -70,7 +70,7 @@
                 <svg class="nav-icon" style="color:#e6b3cc;">
                     <use xlink:href="{{ asset('icons/coreui.svg#cil-people') }}"></use>
                 </svg>
-                {{ __('G.Personal y Clientes') }}
+                {{ __('Personal-Clientes') }}
             </a>
             <ul class="nav-group-items" style="padding-left:0.5rem;">
                 @can('ver clientes')
@@ -114,7 +114,7 @@
             <svg class="nav-icon" style="color:#e6b3cc;">
                 <use xlink:href="{{ asset('icons/coreui.svg#cil-layers') }}"></use>
             </svg>
-            {{ __('G.Inventario y Herramientas') }}
+            {{ __('Inventario-Herramientas') }}
         </a>
         <ul class="nav-group-items" style="padding-left:0.5rem;">
             @can('ver herramientas')
@@ -156,7 +156,7 @@
             <svg class="nav-icon" style="color:#e6b3cc;">
                 <use xlink:href="{{ asset('icons/coreui.svg#cil-calendar-check') }}"></use>
             </svg>
-            {{ __('G.Servicios y Citas') }}
+            {{ __('Servicios-Citas') }}
         </a>
         <ul class="nav-group-items" style="padding-left:0.5rem;">
 
@@ -212,7 +212,7 @@
             <svg class="nav-icon" style="color:#e6b3cc;">
                 <use xlink:href="{{ asset('icons/coreui.svg#cil-gift') }}"></use>
             </svg>
-            {{ __('G.Promocion y Comunicacion') }}
+            {{ __('Promocion-Comunicacion') }}
         </a>
         <ul class="nav-group-items" style="padding-left:0.5rem;">
 

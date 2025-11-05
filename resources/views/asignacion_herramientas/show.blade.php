@@ -15,7 +15,7 @@
                 <dd class="col-9">{{ $item->herramienta->nombre ?? '-' }}</dd>
 
                 <dt class="col-3">Estilista</dt>
-                <dd class="col-9">{{ $item->estilista->nombre ?? '-' }}</dd>
+                <dd class="col-9">{{ $item->estilista->user->name ?? '-' }}</dd>
 
                 <dt class="col-3">Recepcionista</dt>
                 <dd class="col-9">{{ $item->recepcionista->name ?? '-' }}</dd>

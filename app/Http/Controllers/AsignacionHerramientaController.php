@@ -15,7 +15,7 @@ class AsignacionHerramientaController extends Controller
      */
     public function index()
     {
-        $items = AsignacionHerramientaModel::with(['herramienta', 'estilista', 'recepcionista'])->orderBy('fechaAsignacion', 'desc')->paginate(20);
+        $items = AsignacionHerramientaModel::with(['herramienta', 'estilista.user', 'recepcionista'])->orderBy('fechaAsignacion', 'desc')->paginate(20);
         return view('asignacion_herramientas.index', compact('items'));
     }
 
@@ -56,7 +56,7 @@ class AsignacionHerramientaController extends Controller
      */
     public function show(string $id)
     {
-        $item = AsignacionHerramientaModel::with(['herramienta', 'estilista', 'recepcionista'])->findOrFail($id);
+        $item = AsignacionHerramientaModel::with(['herramienta', 'estilista.user', 'recepcionista'])->findOrFail($id);
         return view('asignacion_herramientas.show', compact('item'));
     }
 
