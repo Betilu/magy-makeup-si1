@@ -127,6 +127,17 @@
                     </a>
                 </li>
             @endcan
+            @can('ver asignacion herramientas')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('asignacion_herramientas.index') }}">
+                        <svg class="nav-icon">
+                            <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+                        </svg>
+                        {{ __('Herramientas') }}
+                    </a>
+                </li>
+            @endcan    
+
         </ul>
     </li>
 
@@ -141,6 +152,50 @@
         </li>
     @endcan
 
+    @can('ver promociones')
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('promocions.index') }}">
+                <svg class="nav-icon">
+                    <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+                </svg>
+                {{ __('Promociones') }}
+            </a>
+        </li>
+    @endcan
 
+    @can('ver servicios')
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('servicios.index') }}">
+                <svg class="nav-icon">
+                    <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+                </svg>
+                {{ __('Servicios') }}
+            </a>
+        </li>
+    @endcan
+
+    @can('ver servicio productos')
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('servicios_productos.index') }}">
+                <svg class="nav-icon">
+                    <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+                </svg>
+                {{ __('Servicios Productos') }}
+            </a>
+        </li>
+    @endcan
+
+    @can('ver promocion servicios')
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('promocion_servicios.index') }}">
+                <svg class="nav-icon">
+                    <use xlink:href="{{ asset('icons/coreui.svg#cil-book') }}"></use>
+                </svg>
+                {{ __('Promocion Servicios') }}
+            </a>
+        </li>
+    @endcan
+
+    
 
 </ul>
