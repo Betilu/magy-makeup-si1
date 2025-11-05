@@ -109,7 +109,7 @@
                                     </div>
                                     <form action="{{ route('asignacion_herramientas.update', $item->id) }}" method="post">
                                         @method('PUT')
-                                        @include('asignacion_herramientas._form', ['item' => $item, 'herramientas' => App\Models\Herramienta::orderBy("nombre")->get(), 'estilistas' => App\Models\Estilista::orderBy("nombre")->get(), 'recepcionistas' => App\Models\User::orderBy("name")->get()])
+                                        @include('asignacion_herramientas._form', ['item' => $item, 'herramientas' => App\Models\Herramienta::orderBy("nombre")->get(), 'estilistas' => App\Models\Estilista::with('user')->get()->sortBy('user.name'), 'recepcionistas' => App\Models\User::orderBy("name")->get()])
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                                             <button type="submit" class="btn btn-primary">Guardar</button>
@@ -166,7 +166,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="{{ route('asignacion_herramientas.store') }}" method="post">
-                    @include('asignacion_herramientas._form', ['herramientas' => App\Models\Herramienta::orderBy("nombre")->get(), 'estilistas' => App\Models\Estilista::orderBy("nombre")->get(), 'recepcionistas' => App\Models\User::orderBy("name")->get()])
+                    @include('asignacion_herramientas._form', ['herramientas' => App\Models\Herramienta::orderBy("nombre")->get(), 'estilistas' => App\Models\Estilista::with('user')->get()->sortBy('user.name'), 'recepcionistas' => App\Models\User::orderBy("name")->get()])
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Crear</button>
