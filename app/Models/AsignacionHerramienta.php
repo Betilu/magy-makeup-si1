@@ -20,6 +20,11 @@ class AsignacionHerramienta extends Model
        
     ];
 
+    protected $casts = [
+        'fechaAsignacion' => 'date',
+        'fechaDevolucion' => 'date',
+    ];
+
     public function herramienta()
     {
         return $this->belongsTo(Herramienta::class);
