@@ -12,7 +12,8 @@ class CitaController extends Controller
      */
     public function index()
     {
-        $citas = Cita::all();
+        // Use pagination so the view can call ->links() without error
+        $citas = Cita::with('user')->orderBy('fecha', 'desc')->paginate(15);
         return view('citas.index', compact('citas'));
     }
 

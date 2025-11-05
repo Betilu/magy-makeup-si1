@@ -7,9 +7,17 @@
     <form action="{{ route('notificacions.update', $notificacion->id) }}" method="POST" class="bg-white p-4 rounded shadow-sm">
         @csrf
         @method('PUT')
+        @php $clients = App\Models\Client::orderBy('nombre')->get(); @endphp
         <div class="mb-3">
-            <label class="form-label">Cliente (ID)</label>
-            <input type="number" name="client_id" value="{{ $notificacion->client_id }}" class="form-control" required>
+            <label class="form-label">Cliente</label>
+            <div>
+                @foreach($clients as $client)
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="client_id" id="client_{{ $client->id }}" value="{{ $client->id }}" {{ (old('client_id', $notificacion->client_id) == $client->id) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="client_{{ $client->id }}">{{ $client->nombre ?? $client->name }}{{ isset($client->telefono) ? ' - '.$client->telefono : '' }}</label>
+                    </div>
+                @endforeach
+            </div>
             @error('client_id')
                 <div class="text-danger small">{{ $message }}</div>
             @enderror

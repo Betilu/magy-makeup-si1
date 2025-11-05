@@ -95,10 +95,18 @@
                                         @method('PUT')
                                         @csrf
                                         <div class="modal-body">
+                                            @php $users = App\Models\User::orderBy('name')->get(); @endphp
                                             <div class="mb-3">
-                                                <label class="form-label">Usuario (ID)</label>
-                                                <input type="text" name="user_id" value="{{ old('user_id', $cita->user_id) }}" class="form-control">
-                                            </div>
+                                                    <label class="form-label">Usuario</label>
+                                                    <div>
+                                                        @foreach($users as $user)
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="user_id" id="user_edit_{{ $cita->id }}_{{ $user->id }}" value="{{ $user->id }}" {{ (old('user_id', $cita->user_id) == $user->id) ? 'checked' : '' }}>
+                                                                <label class="form-check-label" for="user_edit_{{ $cita->id }}_{{ $user->id }}">{{ $user->name }}</label>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Estado</label>
                                                 <input type="text" name="estado" value="{{ old('estado', $cita->estado) }}" class="form-control">
@@ -178,9 +186,17 @@
                 <form action="{{ route('citas.store') }}" method="post">
                     @csrf
                     <div class="modal-body">
+                        @php $users = App\Models\User::orderBy('name')->get(); @endphp
                         <div class="mb-3">
-                            <label class="form-label">Usuario (ID)</label>
-                            <input type="text" name="user_id" value="{{ old('user_id') }}" class="form-control">
+                            <label class="form-label">Usuario</label>
+                            <div>
+                                @foreach($users as $user)
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="user_id" id="user_create_{{ $user->id }}" value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="user_create_{{ $user->id }}">{{ $user->name }}</label>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Estado</label>
