@@ -16,7 +16,7 @@
     <select name="estilista_id" class="form-select asignacion-herramienta-estilista" required>
         <option value="">-- Seleccione --</option>
         @foreach($estilistas as $e)
-            <option value="{{ $e->id }}" {{ (string)old('estilista_id', isset($item) ? $item->estilista_id : '') === (string)$e->id ? 'selected' : '' }}>{{ $e->nombre }}</option>
+            <option value="{{ $e->id }}" {{ (string)old('estilista_id', isset($item) ? $item->estilista_id : '') === (string)$e->id ? 'selected' : '' }}>{{ $e->user->name ?? 'Sin nombre' }}</option>
         @endforeach
     </select>
     @error('estilista_id') <div class="text-danger small">{{ $message }}</div> @enderror

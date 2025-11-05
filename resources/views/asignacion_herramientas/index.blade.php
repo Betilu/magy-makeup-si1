@@ -42,7 +42,7 @@
                         @foreach($items as $item)
                         <tr>
                             <td>{{ $item->herramienta->nombre ?? '-' }}</td>
-                            <td>{{ $item->estilista->nombre ?? '-' }}</td>
+                            <td>{{ $item->estilista->user->name ?? '-' }}</td>
                             <td>{{ $item->recepcionista->name ?? '-' }}</td>
                             <td>{{ optional($item->fechaAsignacion)->format('Y-m-d') }}</td>
                             <td class="text-end">
@@ -74,7 +74,7 @@
                                             <dd class="col-8">{{ $item->herramienta->nombre ?? '-' }}</dd>
 
                                             <dt class="col-4">Estilista</dt>
-                                            <dd class="col-8">{{ $item->estilista->nombre ?? '-' }}</dd>
+                                            <dd class="col-8">{{ $item->estilista->user->name ?? '-' }}</dd>
 
                                             <dt class="col-4">Recepcionista</dt>
                                             <dd class="col-8">{{ $item->recepcionista->name ?? '-' }}</dd>
@@ -128,7 +128,7 @@
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        ¿Seguro que deseas eliminar la asignación de "{{ $item->herramienta->nombre ?? '-' }}" a "{{ $item->estilista->nombre ?? '-' }}"?
+                                        ¿Seguro que deseas eliminar la asignación de "{{ $item->herramienta->nombre ?? '-' }}" a "{{ $item->estilista->user->name ?? '-' }}"?
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
