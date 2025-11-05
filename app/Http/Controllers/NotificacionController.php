@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Notificacion;
 use App\Models\Cita;
+use Illuminate\Support\Facades\DB;
 
 class NotificacionController extends Controller
 {
@@ -26,7 +27,12 @@ class NotificacionController extends Controller
         // Pasar las citas con su cliente (y el usuario del cliente) para mostrar
         // en la vista radios con "nombre del cliente - id de la cita".
         $citas = Cita::with('client.user')->get();
-        return view('notificacions.create', compact('citas'));
+        // Ejecutar la consulta SQL que solicitaste y obtener solo los nombres
+        // Nota: la consulta original usa sintaxis clásica (FROM users, clients WHERE ...)
+        // la dejamos tal cual para devolver los nombres solicitados.
+        $clientNames = DB::select('SELECT users.name FROM users, clients WHERE users.id=clients.user_id');
+
+        return view('notificacions.create', compact('citas', 'clientNames'));
     }
 
     /**
