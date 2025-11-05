@@ -15,7 +15,8 @@ class NotificacionController extends Controller
     public function index()
     {
         // Eager load client (and its user if needed) to avoid N+1 when rendering list
-        $notificacions = Notificacion::with('client.user')->get();
+        // Use pagination so the view can call $notificacions->links()
+        $notificacions = Notificacion::with('client.user')->paginate(15);
         return view('notificacions.index', compact('notificacions'));
     }
 
