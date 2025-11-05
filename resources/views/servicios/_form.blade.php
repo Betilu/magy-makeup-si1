@@ -2,7 +2,7 @@
 
 <div class="mb-3">
     <label class="form-label">Categoría</label>
-    <input type="number" name="categoria" value="{{ old('categoria', $servicio->categoria ?? '') }}" class="form-control servicio-categoria" required>
+    <input type="text" name="categoria" value="{{ old('categoria', $servicio->categoria ?? '') }}" class="form-control servicio-categoria" required>
     @error('categoria') <div class="text-danger small">{{ $message }}</div> @enderror
 </div>
 

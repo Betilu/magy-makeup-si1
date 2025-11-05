@@ -30,7 +30,7 @@ class ServicioController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'categoria' => 'required|numeric',
+            'categoria' => 'required|string',
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
             'duracion' => 'required|string|max:255',
@@ -67,7 +67,7 @@ class ServicioController extends Controller
         $servicio = ServicioModel::findOrFail($id);
 
         $data = $request->validate([
-            'categoria' => 'required|numeric',
+            'categoria' => 'required|string',
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
             'duracion' => 'required|string|max:255',
