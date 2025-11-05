@@ -32,6 +32,22 @@
 
         {{-- Campo oculto client_id que se completa automáticamente desde la cita seleccionada. --}}
         <input type="hidden" name="client_id" id="client_id" value="{{ old('client_id') }}">
+
+        {{-- Mostrar resultados de la consulta SQL solicitada: lista de nombres de usuarios asociados a clients --}}
+        <div class="mb-3">
+            <label class="form-label">Clientes (consulta SQL)</label>
+            <div>
+                @if(isset($clientNames) && count($clientNames))
+                    <ul class="list-unstyled">
+                        @foreach($clientNames as $cn)
+                            <li>{{ $cn->name ?? '' }}</li>
+                        @endforeach
+                    </ul>
+                @else
+                    <div class="text-muted small">No se encontraron clientes.</div>
+                @endif
+            </div>
+        </div>
         <div class="mb-3">
             <label class="form-label">Estado</label>
             <input type="text" name="estado" class="form-control" required>
