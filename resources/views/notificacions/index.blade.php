@@ -31,7 +31,7 @@
                     <tbody>
                         @foreach($notificacions as $notificacion)
                         <tr>
-                            <td>{{ $notificacion->client_id }}</td>
+                            <td>{{ $notificacion->client->user->name ?? 'Sin nombre' }}</td>
                             <td>{{ $notificacion->cita_id }}</td>
                             <td>{{ $notificacion->estado }}</td>
                             <td>{{ $notificacion->fecha }}</td>
@@ -56,7 +56,7 @@
                                     <div class="modal-body">
                                         <dl class="row">
                                             <dt class="col-4">Cliente</dt>
-                                            <dd class="col-8">{{ $notificacion->client_id }}</dd>
+                                            <dd class="col-8">{{ $notificacion->client->user->name ?? 'Sin nombre' }}</dd>
 
                                             <dt class="col-4">Cita</dt>
                                             <dd class="col-8">{{ $notificacion->cita_id }}</dd>
