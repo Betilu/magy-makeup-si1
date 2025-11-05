@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Notificacion;
+use App\Models\Cita;
 
 class NotificacionController extends Controller
 {
@@ -12,7 +13,8 @@ class NotificacionController extends Controller
      */
     public function index()
     {
-        $notificacions = Notificacion::all();
+        // Eager load client (and its user if needed) to avoid N+1 when rendering list
+        $notificacions = Notificacion::with('client.user')->get();
         return view('notificacions.index', compact('notificacions'));
     }
 
@@ -21,7 +23,10 @@ class NotificacionController extends Controller
      */
     public function create()
     {
-        return view('notificacions.create');
+        // Pasar las citas con su cliente (y el usuario del cliente) para mostrar
+        // en la vista radios con "nombre del cliente - id de la cita".
+        $citas = Cita::with('client.user')->get();
+        return view('notificacions.create', compact('citas'));
     }
 
     /**
@@ -30,12 +35,15 @@ class NotificacionController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'client_id' => 'required|exists:clients,id',
             'cita_id' => 'required|exists:citas,id',
             'estado' => 'required|string',
             'fecha' => 'required|string',
             'mensaje' => 'required|string',
         ]);
+
+        // Asegurarse que client_id venga desde la cita seleccionada (evita manipulación desde el cliente)
+        $cita = Cita::findOrFail($validated['cita_id']);
+        $validated['client_id'] = $cita->client_id;
 
         Notificacion::create($validated);
         return redirect()->route('notificacions.index')->with('success', 'Notificación creada correctamente');
