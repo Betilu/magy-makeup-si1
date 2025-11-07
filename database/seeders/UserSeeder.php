@@ -57,7 +57,7 @@ class UserSeeder extends Seeder
         
         $roleRecepcionista = Role::create(['name' => 'recepcionista']);
         $recepcionistaUser->assignRole($roleRecepcionista);
-        $roleRecepcionista->syncPermissions(['ver citas']);
+        $roleRecepcionista->syncPermissions(['ver citas', 'editar citas']);
 // ---------------------------------------------------------------
 
         $clienteUser = User::query()->create([
@@ -69,7 +69,7 @@ class UserSeeder extends Seeder
 
         $roleCliente = Role::create(['name' => 'cliente']);
         $clienteUser->assignRole($roleCliente);
-        $roleCliente->syncPermissions(['crear citas']);
+        $roleCliente->syncPermissions(['ver citas', 'crear citas']);
         
         // ---------------------------------------------------------------
 

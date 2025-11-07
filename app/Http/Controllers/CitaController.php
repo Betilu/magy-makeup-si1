@@ -65,7 +65,7 @@ class CitaController extends Controller
         
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
-            'estado' => 'required|string',
+            'estado' => 'nullable|string',
             'anticipo' => 'nullable|numeric',
             'fecha' => 'required|string',
             'hora' => 'required|string',
@@ -73,8 +73,15 @@ class CitaController extends Controller
         ]);
 
         // Si es cliente, forzar que el user_id sea el del usuario autenticado
+        // y establecer el estado como "pendiente"
         if (Auth::user()->hasRole('cliente') && !Auth::user()->hasRole('super-admin')) {
             $validated['user_id'] = Auth::id();
+            $validated['estado'] = 'pendiente';
+        }
+        
+        // Si no se especificó estado, establecer como "pendiente"
+        if (!isset($validated['estado'])) {
+            $validated['estado'] = 'pendiente';
         }
 
         Cita::create($validated);
