@@ -9,11 +9,24 @@ php artisan migrate:fresh --seed
 php artisan db:seed
 php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
 php artisan storage:link
+php artisan serve
 
 rm -rf public/build
 npm install
 npm run dev   # o npm run build
 php artisan optimize:clear
+
+
+CREACION DE LA RAMA
+git branch
+git branch mi_rama
+git checkout mi_rama
+
+TRAER LOS CAMBIOS DE LA RAMA main
+git fetch origin
+git merge origin/main
+git pull origin mi_rama
+
 
 
 

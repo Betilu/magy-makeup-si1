@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('nombre');
             $table->text('descripcion')->nullable();
             $table->string('duracion');
-          
+            $table->decimal('precio_servicio', 8, 2);
+            $table->string('estado');
             $table->timestamps();
         });
     }
