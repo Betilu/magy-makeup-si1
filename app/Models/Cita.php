@@ -13,17 +13,39 @@ class Cita extends Model
 
     protected $fillable = [
         'user_id',
+        'estilista_id',
+        'servicio_id',
         'estado',
         'anticipo',
+        'precio_total',
+        'comision_estilista',
         'fecha',
         'hora',
         'tipo',
+    ];
+
+    protected $casts = [
+        'anticipo' => 'decimal:2',
+        'precio_total' => 'decimal:2',
+        'comision_estilista' => 'decimal:2',
     ];
 
     // 🔗 Relación: una cita pertenece a un usuario
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // 🔗 Relación: una cita pertenece a un estilista
+    public function estilista()
+    {
+        return $this->belongsTo(Estilista::class);
+    }
+
+    // 🔗 Relación: una cita pertenece a un servicio
+    public function servicio()
+    {
+        return $this->belongsTo(Servicio::class);
     }
 
     // 🔗 Relación: una cita puede tener notificaciones

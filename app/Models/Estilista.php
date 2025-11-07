@@ -12,14 +12,34 @@ class Estilista extends Model
         'horario_id',
         'calificacion',
         'comision',
+        'total_comisiones',
         'disponibilidad',
         'especialidad',
+        'estado',
     ];
 
     protected $casts = [
         'calificacion' => 'integer',
         'comision' => 'decimal:2',
+        'total_comisiones' => 'decimal:2',
     ];
+
+    /**
+     * Obtener el porcentaje de comisión según el estado del estilista
+     */
+    public function getPorcentajeComisionAttribute()
+    {
+        return $this->estado === 'antiguo' ? 50 : 40;
+    }
+
+    /**
+     * Calcular comisión para un precio de servicio
+     */
+    public function calcularComision($precioServicio)
+    {
+        $porcentaje = $this->porcentaje_comision;
+        return ($precioServicio * $porcentaje) / 100;
+    }
 
     public function user(): BelongsTo
     {
@@ -29,5 +49,10 @@ class Estilista extends Model
     public function horario(): BelongsTo
     {
         return $this->belongsTo(Horario::class);
+    }
+
+    public function citas()
+    {
+        return $this->hasMany(Cita::class);
     }
 }
