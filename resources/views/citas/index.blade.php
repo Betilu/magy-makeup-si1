@@ -30,11 +30,13 @@
                     <thead>
                         <tr>
                             <th>Cliente</th>
+                            <th>Estilista</th>
+                            <th>Servicio</th>
                             <th>Estado</th>
-                            <th>Anticipo</th>
+                            <th>Precio</th>
+                            <th>Comisión</th>
                             <th>Fecha</th>
                             <th>Hora</th>
-                            <th>Tipo</th>
                             <th class="text-end">Acciones</th>
                         </tr>
                     </thead>
@@ -43,14 +45,25 @@
                         <tr>
                             <td>{{ $cita->user->name ?? 'N/A' }}</td>
                             <td>
-                                <span class="badge {{ $cita->estado === 'confirmada' ? 'bg-success' : ($cita->estado === 'pendiente' ? 'bg-warning' : 'bg-secondary') }}">
+                                @if($cita->estilista)
+                                    {{ $cita->estilista->user->name ?? 'N/A' }}
+                                    <span class="badge bg-info">{{ $cita->estilista->porcentaje_comision }}%</span>
+                                @else
+                                    <span class="text-muted">Sin asignar</span>
+                                @endif
+                            </td>
+                            <td>{{ $cita->servicio->nombre ?? 'N/A' }}</td>
+                            <td>
+                                <span class="badge {{ $cita->estado === 'confirmada' ? 'bg-success' : ($cita->estado === 'pendiente' ? 'bg-warning' : ($cita->estado === 'completada' ? 'bg-primary' : 'bg-secondary')) }}">
                                     {{ ucfirst($cita->estado) }}
                                 </span>
                             </td>
-                            <td>${{ number_format($cita->anticipo ?? 0, 2) }}</td>
+                            <td><strong>${{ number_format($cita->precio_total ?? 0, 2) }}</strong></td>
+                            <td>
+                                <span class="text-success fw-bold">${{ number_format($cita->comision_estilista ?? 0, 2) }}</span>
+                            </td>
                             <td>{{ optional($cita->fecha)->format ? $cita->fecha : $cita->fecha }}</td>
                             <td>{{ $cita->hora }}</td>
-                            <td>{{ $cita->tipo }}</td>
                             <td class="text-end">
                                 <div class="btn-group" role="group">
                                     @can('view', $cita)
@@ -80,8 +93,31 @@
                                             <dt class="col-4">Cliente</dt>
                                             <dd class="col-8">{{ $cita->user->name ?? 'N/A' }}</dd>
 
+                                            <dt class="col-4">Estilista</dt>
+                                            <dd class="col-8">
+                                                @if($cita->estilista)
+                                                    {{ $cita->estilista->user->name ?? 'N/A' }}
+                                                    <span class="badge bg-info ms-2">{{ $cita->estilista->estado }} - {{ $cita->estilista->porcentaje_comision }}%</span>
+                                                @else
+                                                    <span class="text-muted">Sin asignar</span>
+                                                @endif
+                                            </dd>
+
+                                            <dt class="col-4">Servicio</dt>
+                                            <dd class="col-8">{{ $cita->servicio->nombre ?? 'N/A' }}</dd>
+
                                             <dt class="col-4">Estado</dt>
-                                            <dd class="col-8">{{ ucfirst($cita->estado) }}</dd>
+                                            <dd class="col-8">
+                                                <span class="badge {{ $cita->estado === 'confirmada' ? 'bg-success' : ($cita->estado === 'pendiente' ? 'bg-warning' : ($cita->estado === 'completada' ? 'bg-primary' : 'bg-secondary')) }}">
+                                                    {{ ucfirst($cita->estado) }}
+                                                </span>
+                                            </dd>
+
+                                            <dt class="col-4">Precio Total</dt>
+                                            <dd class="col-8"><strong class="text-primary">${{ number_format($cita->precio_total ?? 0, 2) }}</strong></dd>
+
+                                            <dt class="col-4">Comisión Estilista</dt>
+                                            <dd class="col-8"><strong class="text-success">${{ number_format($cita->comision_estilista ?? 0, 2) }}</strong></dd>
 
                                             <dt class="col-4">Anticipo</dt>
                                             <dd class="col-8">${{ number_format($cita->anticipo ?? 0, 2) }}</dd>
@@ -128,6 +164,33 @@
                                                     @endforeach
                                                 </select>
                                             </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Estilista</label>
+                                                    <select name="estilista_id" class="form-select" required>
+                                                        <option value="">Seleccione un estilista...</option>
+                                                        @foreach($estilistas as $estilista)
+                                                            <option value="{{ $estilista->id }}" {{ (old('estilista_id', $cita->estilista_id) == $estilista->id) ? 'selected' : '' }}>
+                                                                {{ $estilista->user->name }} ({{ ucfirst($estilista->estado) }} - {{ $estilista->porcentaje_comision }}%)
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Servicio</label>
+                                                    <select name="servicio_id" class="form-select" required>
+                                                        <option value="">Seleccione un servicio...</option>
+                                                        @foreach($servicios as $servicio)
+                                                            <option value="{{ $servicio->id }}" {{ (old('servicio_id', $cita->servicio_id) == $servicio->id) ? 'selected' : '' }}>
+                                                                {{ $servicio->nombre }} - ${{ number_format($servicio->precio_servicio, 2) }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
                                             <div class="mb-3">
                                                 <label class="form-label">Estado</label>
                                                 <select name="estado" class="form-select" required>
@@ -137,6 +200,7 @@
                                                     <option value="completada" {{ old('estado', $cita->estado) == 'completada' ? 'selected' : '' }}>Completada</option>
                                                 </select>
                                             </div>
+
                                             <div class="mb-3">
                                                 <label class="form-label">Anticipo</label>
                                                 <input type="number" step="0.01" name="anticipo" value="{{ old('anticipo', $cita->anticipo) }}" class="form-control">
@@ -239,6 +303,56 @@
                         </div>
                         @endif
                         
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Estilista <span class="text-danger">*</span></label>
+                                <select name="estilista_id" class="form-select" required id="estilistaDrop">
+                                    <option value="">Seleccione un estilista...</option>
+                                    @foreach($estilistas as $estilista)
+                                        <option value="{{ $estilista->id }}" 
+                                                data-comision="{{ $estilista->porcentaje_comision }}"
+                                                {{ old('estilista_id') == $estilista->id ? 'selected' : '' }}>
+                                            {{ $estilista->user->name }} - {{ ucfirst($estilista->estado) }} ({{ $estilista->porcentaje_comision }}%)
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <small class="text-muted">La comisión se calculará automáticamente</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Servicio <span class="text-danger">*</span></label>
+                                <select name="servicio_id" class="form-select" required id="servicioDrop">
+                                    <option value="">Seleccione un servicio...</option>
+                                    @foreach($servicios as $servicio)
+                                        <option value="{{ $servicio->id }}" 
+                                                data-precio="{{ $servicio->precio_servicio }}"
+                                                {{ old('servicio_id') == $servicio->id ? 'selected' : '' }}>
+                                            {{ $servicio->nombre }} - ${{ number_format($servicio->precio_servicio, 2) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <small class="text-muted">Precio del Servicio:</small>
+                                        <h5 class="mb-0 text-primary" id="precioServicio">$0.00</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <small class="text-muted">Comisión Estilista:</small>
+                                        <h5 class="mb-0 text-success" id="comisionEstilista">$0.00</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         @if(!$isCliente)
                         <div class="mb-3">
                             <label class="form-label">Estado</label>
@@ -282,4 +396,41 @@
     @endcan
 
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const estilistaDrop = document.getElementById('estilistaDrop');
+    const servicioDrop = document.getElementById('servicioDrop');
+    const precioServicioEl = document.getElementById('precioServicio');
+    const comisionEstilistaEl = document.getElementById('comisionEstilista');
+
+    function calcularComision() {
+        const servicioOption = servicioDrop.options[servicioDrop.selectedIndex];
+        const estilistaOption = estilistaDrop.options[estilistaDrop.selectedIndex];
+        
+        if (servicioOption && estilistaOption && servicioOption.value && estilistaOption.value) {
+            const precio = parseFloat(servicioOption.dataset.precio) || 0;
+            const comisionPorcentaje = parseFloat(estilistaOption.dataset.comision) || 0;
+            const comision = (precio * comisionPorcentaje) / 100;
+            
+            precioServicioEl.textContent = '$' + precio.toFixed(2);
+            comisionEstilistaEl.textContent = '$' + comision.toFixed(2);
+        } else {
+            precioServicioEl.textContent = '$0.00';
+            comisionEstilistaEl.textContent = '$0.00';
+        }
+    }
+
+    if (estilistaDrop && servicioDrop) {
+        estilistaDrop.addEventListener('change', calcularComision);
+        servicioDrop.addEventListener('change', calcularComision);
+        
+        // Calcular si hay valores pre-seleccionados
+        calcularComision();
+    }
+});
+</script>
+@endpush
+
 @endsection
