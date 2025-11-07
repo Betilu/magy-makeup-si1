@@ -82,9 +82,46 @@ class UserSeeder extends Seeder
 
         $roleEstilista = Role::create(['name' => 'estilista']);
         $estilistaUser->assignRole($roleEstilista);        
+        
+        // ---------------------------------------------------------------
+        // Crear más usuarios clientes para el seeder
+        $clientes = [
+            ['name' => 'María García', 'email' => 'maria.garcia@gmail.com', 'password' => '12345'],
+            ['name' => 'Ana López', 'email' => 'ana.lopez@gmail.com', 'password' => '12345'],
+            ['name' => 'Carmen Martínez', 'email' => 'carmen.martinez@gmail.com', 'password' => '12345'],
+            ['name' => 'Laura Rodríguez', 'email' => 'laura.rodriguez@gmail.com', 'password' => '12345'],
+            ['name' => 'Sofía Hernández', 'email' => 'sofia.hernandez@gmail.com', 'password' => '12345'],
+            ['name' => 'Isabella Torres', 'email' => 'isabella.torres@gmail.com', 'password' => '12345'],
+        ];
+
+        foreach ($clientes as $clienteData) {
+            $user = User::create([
+                'name' => $clienteData['name'],
+                'email' => $clienteData['email'],
+                'password' => $clienteData['password'],
+                'email_verified_at' => now()
+            ]);
+            $user->assignRole($roleCliente);
+        }
+
+        // Crear más usuarios estilistas para el seeder
+        $estilistas = [
+            ['name' => 'Valentina Ruiz', 'email' => 'valentina.ruiz@magy.com', 'password' => '12345'],
+            ['name' => 'Camila Díaz', 'email' => 'camila.diaz@magy.com', 'password' => '12345'],
+            ['name' => 'Gabriela Morales', 'email' => 'gabriela.morales@magy.com', 'password' => '12345'],
+            ['name' => 'Daniela Castro', 'email' => 'daniela.castro@magy.com', 'password' => '12345'],
+            ['name' => 'Natalia Ramos', 'email' => 'natalia.ramos@magy.com', 'password' => '12345'],
+            ['name' => 'Fernanda Silva', 'email' => 'fernanda.silva@magy.com', 'password' => '12345'],
+        ];
+
+        foreach ($estilistas as $estilistaData) {
+            $user = User::create([
+                'name' => $estilistaData['name'],
+                'email' => $estilistaData['email'],
+                'password' => $estilistaData['password'],
+                'email_verified_at' => now()
+            ]);
+            $user->assignRole($roleEstilista);
+        }
     }
-
-    
-
-    
 }
