@@ -117,14 +117,13 @@
                                         @method('PUT')
                                         @csrf
                                         <div class="modal-body">
-                                            @php $users = App\Models\User::orderBy('name')->get(); @endphp
                                             <div class="mb-3">
                                                 <label class="form-label">Cliente</label>
                                                 <select name="user_id" class="form-select" required>
                                                     <option value="">Seleccione un cliente...</option>
-                                                    @foreach($users as $user)
-                                                        <option value="{{ $user->id }}" {{ (old('user_id', $cita->user_id) == $user->id) ? 'selected' : '' }}>
-                                                            {{ $user->name }}
+                                                    @foreach($clientes as $cliente)
+                                                        <option value="{{ $cliente->id }}" {{ (old('user_id', $cita->user_id) == $cliente->id) ? 'selected' : '' }}>
+                                                            {{ $cliente->name }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -218,7 +217,6 @@
                     @csrf
                     <div class="modal-body">
                         @php 
-                            $users = App\Models\User::orderBy('name')->get(); 
                             $isCliente = auth()->user()->hasRole('cliente') && !auth()->user()->hasRole('super-admin');
                         @endphp
                         
@@ -227,9 +225,9 @@
                             <label class="form-label">Cliente</label>
                             <select name="user_id" class="form-select" required>
                                 <option value="">Seleccione un cliente...</option>
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
-                                        {{ $user->name }}
+                                @foreach($clientes as $cliente)
+                                    <option value="{{ $cliente->id }}" {{ old('user_id') == $cliente->id ? 'selected' : '' }}>
+                                        {{ $cliente->name }}
                                     </option>
                                 @endforeach
                             </select>

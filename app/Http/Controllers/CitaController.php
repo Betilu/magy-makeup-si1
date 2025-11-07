@@ -4,10 +4,24 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Cita;
+use App\Models\User;
+use App\Models\Client;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CitaController extends Controller
 {
+    /**
+     * Obtener lista de clientes (usuarios con registro en tabla clients)
+     */
+    private function getClientes()
+    {
+        return User::select('users.id', 'users.name')
+            ->join('clients', 'users.id', '=', 'clients.user_id')
+            ->orderBy('users.name')
+            ->get();
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -28,7 +42,10 @@ class CitaController extends Controller
             $citas = Cita::with('user')->orderBy('fecha', 'desc')->paginate(15);
         }
         
-        return view('citas.index', compact('citas'));
+        // Obtener solo los usuarios que son clientes (tienen registro en tabla clients)
+        $clientes = $this->getClientes();
+        
+        return view('citas.index', compact('citas', 'clientes'));
     }
 
     /**
