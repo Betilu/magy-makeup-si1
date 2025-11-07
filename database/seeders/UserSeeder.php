@@ -27,6 +27,13 @@ class UserSeeder extends Seeder
         // Permission::create(['name' => 'crear libros']);
         // Permission::create(['name' => 'editar libros']);
         // Permission::create(['name' => 'eliminar libros']);
+
+// ---------------------------------------------------------------
+        // Permisos para citas
+        Permission::create(['name' => 'ver citas']);
+        Permission::create(['name' => 'crear citas']);
+        Permission::create(['name' => 'editar citas']);
+        Permission::create(['name' => 'eliminar citas']);
        
 
         $adminUser = User::query()->create([
@@ -50,7 +57,7 @@ class UserSeeder extends Seeder
         
         $roleRecepcionista = Role::create(['name' => 'recepcionista']);
         $recepcionistaUser->assignRole($roleRecepcionista);
-        // $roleRecepcionista->syncPermissions(['ver libros']);
+        $roleRecepcionista->syncPermissions(['ver citas']);
 // ---------------------------------------------------------------
 
         $clienteUser = User::query()->create([
@@ -61,7 +68,8 @@ class UserSeeder extends Seeder
         ]);
 
         $roleCliente = Role::create(['name' => 'cliente']);
-        $clienteUser->assignRole($roleCliente);   
+        $clienteUser->assignRole($roleCliente);
+        $roleCliente->syncPermissions(['crear citas']);
         
         // ---------------------------------------------------------------
 

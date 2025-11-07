@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Cita;
+use Illuminate\Support\Facades\Auth;
 
 class CitaController extends Controller
 {
@@ -12,8 +13,21 @@ class CitaController extends Controller
      */
     public function index()
     {
-        // Use pagination so the view can call ->links() without error
-        $citas = Cita::with('user')->orderBy('fecha', 'desc')->paginate(15);
+        $this->authorize('viewAny', Cita::class);
+        
+        $user = Auth::user();
+        
+        // Si es cliente, solo muestra sus propias citas
+        if ($user->hasRole('cliente') && !$user->hasRole('super-admin')) {
+            $citas = Cita::with('user')
+                ->where('user_id', $user->id)
+                ->orderBy('fecha', 'desc')
+                ->paginate(15);
+        } else {
+            // Admin y recepcionista ven todas las citas
+            $citas = Cita::with('user')->orderBy('fecha', 'desc')->paginate(15);
+        }
+        
         return view('citas.index', compact('citas'));
     }
 
@@ -30,14 +44,21 @@ class CitaController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Cita::class);
+        
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'estado' => 'required|string',
-            'anticipo' => 'required|numeric',
+            'anticipo' => 'nullable|numeric',
             'fecha' => 'required|string',
             'hora' => 'required|string',
             'tipo' => 'required|string',
         ]);
+
+        // Si es cliente, forzar que el user_id sea el del usuario autenticado
+        if (Auth::user()->hasRole('cliente') && !Auth::user()->hasRole('super-admin')) {
+            $validated['user_id'] = Auth::id();
+        }
 
         Cita::create($validated);
         return redirect()->route('citas.index')->with('success', 'Cita creada correctamente');
@@ -49,6 +70,7 @@ class CitaController extends Controller
     public function show(string $id)
     {
         $cita = Cita::findOrFail($id);
+        $this->authorize('view', $cita);
         return view('citas.show', compact('cita'));
     }
 
@@ -67,11 +89,12 @@ class CitaController extends Controller
     public function update(Request $request, string $id)
     {
         $cita = Cita::findOrFail($id);
+        $this->authorize('update', $cita);
 
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'estado' => 'required|string',
-            'anticipo' => 'required|numeric',
+            'anticipo' => 'nullable|numeric',
             'fecha' => 'required|string',
             'hora' => 'required|string',
             'tipo' => 'required|string',
@@ -87,6 +110,7 @@ class CitaController extends Controller
     public function destroy(string $id)
     {
         $cita = Cita::findOrFail($id);
+        $this->authorize('delete', $cita);
         $cita->delete();
         return redirect()->route('citas.index')->with('success', 'Cita eliminada correctamente');
     }
