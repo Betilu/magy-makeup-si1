@@ -34,7 +34,9 @@
                             <th>Servicio</th>
                             <th>Estado</th>
                             <th>Precio</th>
-                            {{-- <th>Comisión</th> --}}
+                            @if(!auth()->user()->hasRole('cliente') || auth()->user()->hasRole('super-admin'))
+                            <th>Comisión</th>
+                            @endif
                             <th>Fecha</th>
                             <th>Hora</th>
                             <th class="text-end">Acciones</th>
@@ -47,7 +49,9 @@
                             <td>
                                 @if($cita->estilista)
                                     {{ $cita->estilista->user->name ?? 'N/A' }}
+                                    @if(!auth()->user()->hasRole('cliente') || auth()->user()->hasRole('super-admin'))
                                     <span class="badge bg-info">{{ $cita->estilista->porcentaje_comision }}%</span>
+                                    @endif
                                 @else
                                     <span class="text-muted">Sin asignar</span>
                                 @endif
@@ -59,9 +63,11 @@
                                 </span>
                             </td>
                             <td><strong>${{ number_format($cita->precio_total ?? 0, 2) }}</strong></td>
+                            @if(!auth()->user()->hasRole('cliente') || auth()->user()->hasRole('super-admin'))
                             <td>
                                 <span class="text-success fw-bold">${{ number_format($cita->comision_estilista ?? 0, 2) }}</span>
                             </td>
+                            @endif
                             <td>{{ optional($cita->fecha)->format ? $cita->fecha : $cita->fecha }}</td>
                             <td>{{ $cita->hora }}</td>
                             <td class="text-end">
@@ -97,9 +103,9 @@
                                             <dd class="col-8">
                                                 @if($cita->estilista)
                                                     {{ $cita->estilista->user->name ?? 'N/A' }}
-                                                    <span class="badge bg-info ms-2">{{ $cita->estilista->estado }} 
-                                                        {{-- - {{ $cita->estilista->porcentaje_comision }}% --}}
-                                                    </span>
+                                                    @if(!auth()->user()->hasRole('cliente') || auth()->user()->hasRole('super-admin'))
+                                                    <span class="badge bg-info ms-2">{{ $cita->estilista->estado }} - {{ $cita->estilista->porcentaje_comision }}%</span>
+                                                    @endif
                                                 @else
                                                     <span class="text-muted">Sin asignar</span>
                                                 @endif
@@ -118,8 +124,10 @@
                                             <dt class="col-4">Precio Total</dt>
                                             <dd class="col-8"><strong class="text-primary">${{ number_format($cita->precio_total ?? 0, 2) }}</strong></dd>
 
-                                            {{-- <dt class="col-4">Comisión Estilista</dt>
-                                            <dd class="col-8"><strong class="text-success">${{ number_format($cita->comision_estilista ?? 0, 2) }}</strong></dd> --}}
+                                            @if(!auth()->user()->hasRole('cliente') || auth()->user()->hasRole('super-admin'))
+                                            <dt class="col-4">Comisión Estilista</dt>
+                                            <dd class="col-8"><strong class="text-success">${{ number_format($cita->comision_estilista ?? 0, 2) }}</strong></dd>
+                                            @endif
 
                                             <dt class="col-4">Anticipo</dt>
                                             <dd class="col-8">${{ number_format($cita->anticipo ?? 0, 2) }}</dd>
@@ -174,8 +182,10 @@
                                                         <option value="">Seleccione un estilista...</option>
                                                         @foreach($estilistas as $estilista)
                                                             <option value="{{ $estilista->id }}" {{ (old('estilista_id', $cita->estilista_id) == $estilista->id) ? 'selected' : '' }}>
-                                                                {{ $estilista->user->name }} ({{ ucfirst($estilista->estado) }} 
-                                                                - {{ $estilista->porcentaje_comision }}%)
+                                                                {{ $estilista->user->name }}
+                                                                @if(!auth()->user()->hasRole('cliente') || auth()->user()->hasRole('super-admin'))
+                                                                ({{ ucfirst($estilista->estado) }} - {{ $estilista->porcentaje_comision }}%)
+                                                                @endif
                                                             </option>
                                                         @endforeach
                                                     </select>
@@ -315,13 +325,16 @@
                                         <option value="{{ $estilista->id }}" 
                                                 data-comision="{{ $estilista->porcentaje_comision }}"
                                                 {{ old('estilista_id') == $estilista->id ? 'selected' : '' }}>
-                                            {{ $estilista->user->name }} 
-                                            {{-- - {{ ucfirst($estilista->estado) }} --}}
-                                             {{-- ({{ $estilista->porcentaje_comision }}%) --}}
+                                            {{ $estilista->user->name }}
+                                            @if(!auth()->user()->hasRole('cliente') || auth()->user()->hasRole('super-admin'))
+                                            - {{ ucfirst($estilista->estado) }} ({{ $estilista->porcentaje_comision }}%)
+                                            @endif
                                         </option>
                                     @endforeach
                                 </select>
+                                @if(!auth()->user()->hasRole('cliente') || auth()->user()->hasRole('super-admin'))
                                 <small class="text-muted">La comisión se calculará automáticamente</small>
+                                @endif
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -339,6 +352,7 @@
                             </div>
                         </div>
 
+                        @if(!auth()->user()->hasRole('cliente') || auth()->user()->hasRole('super-admin'))
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <div class="card bg-light">
@@ -348,15 +362,16 @@
                                     </div>
                                 </div>
                             </div>
-                            {{-- <div class="col-md-6 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <div class="card bg-light">
                                     <div class="card-body">
                                         <small class="text-muted">Comisión Estilista:</small>
                                         <h5 class="mb-0 text-success" id="comisionEstilista">$0.00</h5>
                                     </div>
                                 </div>
-                            </div> --}}
+                            </div>
                         </div>
+                        @endif
                         
                         @if(!$isCliente)
                         <div class="mb-3">

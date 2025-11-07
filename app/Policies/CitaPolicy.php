@@ -37,8 +37,9 @@ class CitaPolicy
      */
     public function create(User $user): bool
     {
-        // Admin y cliente pueden crear citas
-        return $user->hasPermissionTo('crear citas') || 
+        // Solo admin y cliente pueden crear citas
+        // Recepcionista NO puede crear
+        return ($user->hasPermissionTo('crear citas') && !$user->hasRole('recepcionista')) || 
                $user->hasRole('super-admin');
     }
 
@@ -58,7 +59,7 @@ class CitaPolicy
     public function delete(User $user, Cita $cita): bool
     {
         // Solo admin puede eliminar citas
-        return $user->hasRole('super-admin') || 
-               $user->hasPermissionTo('eliminar citas');
+        // Recepcionista NO puede eliminar
+        return $user->hasRole('super-admin');
     }
 }
