@@ -315,7 +315,8 @@
                                         <option value="{{ $estilista->id }}" 
                                                 data-comision="{{ $estilista->porcentaje_comision }}"
                                                 {{ old('estilista_id') == $estilista->id ? 'selected' : '' }}>
-                                            {{ $estilista->user->name }} - {{ ucfirst($estilista->estado) }}
+                                            {{ $estilista->user->name }} 
+                                            {{-- - {{ ucfirst($estilista->estado) }} --}}
                                              {{-- ({{ $estilista->porcentaje_comision }}%) --}}
                                         </option>
                                     @endforeach
