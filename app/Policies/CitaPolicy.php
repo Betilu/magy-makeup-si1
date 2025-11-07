@@ -47,7 +47,7 @@ class CitaPolicy
      */
     public function update(User $user, Cita $cita): bool
     {
-        // Solo admin puede editar citas
+        // Admin y recepcionista pueden editar citas
         return $user->hasRole('super-admin') || 
                $user->hasPermissionTo('editar citas');
     }

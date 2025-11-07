@@ -238,6 +238,8 @@
                             <strong>Cliente:</strong> {{ auth()->user()->name }}
                         </div>
                         @endif
+                        
+                        @if(!$isCliente)
                         <div class="mb-3">
                             <label class="form-label">Estado</label>
                             <select name="estado" class="form-select" required>
@@ -247,6 +249,9 @@
                                 <option value="completada" {{ old('estado') == 'completada' ? 'selected' : '' }}>Completada</option>
                             </select>
                         </div>
+                        @else
+                        <input type="hidden" name="estado" value="pendiente">
+                        @endif
                         <div class="mb-3">
                             <label class="form-label">Anticipo</label>
                             <input type="number" step="0.01" name="anticipo" value="{{ old('anticipo', 0) }}" class="form-control">
