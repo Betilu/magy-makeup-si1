@@ -52,4 +52,14 @@ class Producto extends Model
         // para evitar inconsistencias. Si desea manejarlo como decimal, cambiar la
         // migration o la columna a decimal/float y añadir: 'precio' => 'decimal:2'
     ];
+
+    /**
+     * Relación muchos a muchos con Servicio
+     */
+    public function servicios()
+    {
+        return $this->belongsToMany(Servicio::class, 'servicio_productos')
+            ->withPivot('cantidad')
+            ->withTimestamps();
+    }
 }

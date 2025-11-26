@@ -19,6 +19,7 @@ class Herramienta extends Model
         'modelo',
         'fechaAdquisicion',
         'nombre',
+        'cantidad',
         'observacion',
         'tipo',
     ];

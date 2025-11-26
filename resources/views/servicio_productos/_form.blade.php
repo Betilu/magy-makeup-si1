@@ -21,3 +21,9 @@
     </select>
     @error('producto_id') <div class="text-danger small">{{ $message }}</div> @enderror
 </div>
+
+<div class="mb-3">
+    <label class="form-label">Cantidad</label>
+    <input type="number" name="cantidad" class="form-control" value="{{ old('cantidad', isset($item) ? $item->cantidad : 1) }}" min="1" required>
+    @error('cantidad') <div class="text-danger small">{{ $message }}</div> @enderror
+</div>

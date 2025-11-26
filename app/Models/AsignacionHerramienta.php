@@ -9,6 +9,11 @@ class AsignacionHerramienta extends Model
 {
     use HasFactory;
 
+    // Constantes de estado
+    const ESTADO_FUNCIONANDO = 'funcionando';
+    const ESTADO_DEJO_FUNCIONAR = 'dejo de funcionar';
+    const ESTADO_OTRO = 'otro';
+
     protected $fillable = [
         'herramienta_id',
         'estilista_id',
@@ -17,7 +22,7 @@ class AsignacionHerramienta extends Model
         'estadoDevolucion',
         'fechaAsignacion',
         'fechaDevolucion',
-       
+
     ];
 
     protected $casts = [
@@ -38,5 +43,17 @@ class AsignacionHerramienta extends Model
     public function recepcionista()
     {
         return $this->belongsTo(User::class, 'recepcionista_id');
+    }
+
+    /**
+     * Obtener los estados disponibles
+     */
+    public static function getEstados()
+    {
+        return [
+            self::ESTADO_FUNCIONANDO => 'Funcionando',
+            self::ESTADO_DEJO_FUNCIONAR => 'Dejó de funcionar',
+            self::ESTADO_OTRO => 'Otro',
+        ];
     }
 }

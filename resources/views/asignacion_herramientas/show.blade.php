@@ -21,10 +21,30 @@
                 <dd class="col-9">{{ $item->recepcionista->name ?? '-' }}</dd>
 
                 <dt class="col-3">Estado entrega</dt>
-                <dd class="col-9">{{ $item->estadoEntrega ?? '-' }}</dd>
+                <dd class="col-9">
+                    @if($item->estadoEntrega === 'funcionando')
+                        <span class="badge bg-success">Funcionando</span>
+                    @elseif($item->estadoEntrega === 'dejo de funcionar')
+                        <span class="badge bg-danger">Dejó de funcionar</span>
+                    @elseif($item->estadoEntrega === 'otro')
+                        <span class="badge bg-secondary">Otro</span>
+                    @else
+                        {{ $item->estadoEntrega ?? '-' }}
+                    @endif
+                </dd>
 
                 <dt class="col-3">Estado devolución</dt>
-                <dd class="col-9">{{ $item->estadoDevolucion ?? '-' }}</dd>
+                <dd class="col-9">
+                    @if($item->estadoDevolucion === 'funcionando')
+                        <span class="badge bg-success">Funcionando</span>
+                    @elseif($item->estadoDevolucion === 'dejo de funcionar')
+                        <span class="badge bg-danger">Dejó de funcionar</span>
+                    @elseif($item->estadoDevolucion === 'otro')
+                        <span class="badge bg-secondary">Otro</span>
+                    @else
+                        {{ $item->estadoDevolucion ?? '-' }}
+                    @endif
+                </dd>
 
                 <dt class="col-3">Fecha asignación</dt>
                 <dd class="col-9">{{ optional($item->fechaAsignacion)->format('Y-m-d') }}</dd>

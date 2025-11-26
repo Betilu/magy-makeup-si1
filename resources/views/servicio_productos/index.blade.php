@@ -33,6 +33,7 @@
                         <tr>
                             <th>Servicio</th>
                             <th>Producto</th>
+                            <th>Cantidad</th>
                             <th class="text-end">Acciones</th>
                         </tr>
                     </thead>
@@ -41,6 +42,7 @@
                         <tr>
                             <td>{{ $item->servicio->nombre ?? '-' }}</td>
                             <td>{{ $item->producto->nombre ?? '-' }}</td>
+                            <td><span class="badge bg-primary">{{ $item->cantidad ?? 1 }}</span></td>
                             <td class="text-end">
                                 <div class="btn-group" role="group">
                                     @can('ver asignaciones')
@@ -67,6 +69,7 @@
                                     <div class="modal-body">
                                         <p><strong>Servicio:</strong> {{ $item->servicio->nombre ?? '-' }}</p>
                                         <p><strong>Producto:</strong> {{ $item->producto->nombre ?? '-' }}</p>
+                                        <p><strong>Cantidad:</strong> {{ $item->cantidad ?? 1 }}</p>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>

@@ -16,6 +16,9 @@
 
                 <dt class="col-3">Producto</dt>
                 <dd class="col-9">{{ $item->producto->nombre ?? '-' }}</dd>
+
+                <dt class="col-3">Cantidad</dt>
+                <dd class="col-9"><span class="badge bg-primary">{{ $item->cantidad ?? 1 }}</span></dd>
             </dl>
 
             <div class="mt-3">

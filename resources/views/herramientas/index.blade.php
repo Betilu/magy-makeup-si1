@@ -33,6 +33,16 @@
                 </div>
             @endif
 
+            @if(session('warning'))
+                <div class="alert alert-warning alert-dismissible fade show" role="alert" style="border-radius:10px; border-left:4px solid #ffc107;">
+                    <svg class="icon me-2">
+                        <use xlink:href="{{ asset('icons/coreui.svg#cil-warning') }}"></use>
+                    </svg>
+                    {{ session('warning') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
             @if(session('error'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius:10px; border-left:4px solid #dc3545;">
                     <svg class="icon me-2">
@@ -51,6 +61,7 @@
                             <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">Tipo</th>
                             <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">Marca</th>
                             <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">Modelo</th>
+                            <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">Cantidad</th>
                             <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">Estado</th>
                             <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">Fecha Adquisición</th>
                             <th style="border:none; padding:1rem; font-weight:600; color:#662a5b; text-align:center;">Acciones</th>
@@ -63,6 +74,20 @@
                                 <td style="padding:1rem; vertical-align:middle;">{{ $herramienta->tipo }}</td>
                                 <td style="padding:1rem; vertical-align:middle;">{{ $herramienta->marca }}</td>
                                 <td style="padding:1rem; vertical-align:middle;">{{ $herramienta->modelo }}</td>
+                                <td style="padding:1rem; vertical-align:middle;">
+                                    @if($herramienta->cantidad == 0)
+                                        <span class="badge bg-danger" style="padding:0.5rem 1rem; border-radius:8px; font-weight:500;">
+                                            <svg class="icon me-1" style="width:16px; height:16px;">
+                                                <use xlink:href="{{ asset('icons/coreui.svg#cil-warning') }}"></use>
+                                            </svg>
+                                            0 - AGOTADA
+                                        </span>
+                                    @else
+                                        <span class="badge bg-info" style="padding:0.5rem 1rem; border-radius:8px; font-weight:500;">
+                                            {{ $herramienta->cantidad }}
+                                        </span>
+                                    @endif
+                                </td>
                                 <td style="padding:1rem; vertical-align:middle;">
                                     @php
                                         $badgeClass = match($herramienta->estadoHerramienta) {
@@ -83,7 +108,7 @@
                                 <td style="padding:1rem; vertical-align:middle; text-align:center;">
                                     <div class="btn-group" role="group">
                                         @can('ver herramientas')
-                                            <button type="button" class="btn btn-sm btn-secondary" style="color: black; border-radius:8px 0 0 8px;" 
+                                            <button type="button" class="btn btn-sm btn-secondary" style="color: black; border-radius:8px 0 0 8px;"
                                                     data-bs-toggle="modal" data-bs-target="#showModal{{ $herramienta->id }}" title="Ver">
                                                 <svg class="icon">
                                                     <use xlink:href="{{ asset('icons/coreui.svg#cil-eye') }}"></use>
@@ -92,7 +117,7 @@
                                             </button>
                                         @endcan
                                         @can('editar herramientas')
-                                            <button type="button" class="btn btn-sm btn-warning" 
+                                            <button type="button" class="btn btn-sm btn-warning"
                                                     data-bs-toggle="modal" data-bs-target="#editModal{{ $herramienta->id }}" title="Editar">
                                                 <svg class="icon">
                                                     <use xlink:href="{{ asset('icons/coreui.svg#cil-pencil') }}"></use>
@@ -100,7 +125,7 @@
                                             </button>
                                         @endcan
                                         @can('eliminar herramientas')
-                                            <button type="button" class="btn btn-sm btn-danger" style="border-radius:0 8px 8px 0;" 
+                                            <button type="button" class="btn btn-sm btn-danger" style="border-radius:0 8px 8px 0;"
                                                     data-bs-toggle="modal" data-bs-target="#deleteModal{{ $herramienta->id }}" title="Eliminar">
                                                 <svg class="icon">
                                                     <use xlink:href="{{ asset('icons/coreui.svg#cil-trash') }}"></use>
@@ -155,6 +180,25 @@
                                                 </div>
                                             </div>
                                             <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="p-3" style="background-color:#f8f9fa; border-radius:10px;">
+                                                        <label style="font-weight:600; color:#662a5b; font-size:0.875rem;">CANTIDAD</label>
+                                                        <p class="mb-0 mt-2">
+                                                            @if($herramienta->cantidad == 0)
+                                                                <span class="badge bg-danger" style="padding:0.5rem 1rem; border-radius:8px; font-size:1rem;">
+                                                                    <svg class="icon me-1" style="width:16px; height:16px;">
+                                                                        <use xlink:href="{{ asset('icons/coreui.svg#cil-warning') }}"></use>
+                                                                    </svg>
+                                                                    0 - AGOTADA
+                                                                </span>
+                                                            @else
+                                                                <span class="badge bg-info" style="padding:0.5rem 1rem; border-radius:8px; font-size:1rem;">
+                                                                    {{ $herramienta->cantidad }}
+                                                                </span>
+                                                            @endif
+                                                        </p>
+                                                    </div>
+                                                </div>
                                                 <div class="col-md-6 mb-3">
                                                     <div class="p-3" style="background-color:#f8f9fa; border-radius:10px;">
                                                         <label style="font-weight:600; color:#662a5b; font-size:0.875rem;">FECHA ADQUISICIÓN</label>
@@ -231,9 +275,15 @@
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
+                                                        <label for="cantidad{{ $herramienta->id }}" class="form-label" style="font-weight:600; color:#662a5b;">Cantidad *</label>
+                                                        <input type="number" class="form-control" id="cantidad{{ $herramienta->id }}" name="cantidad" value="{{ $herramienta->cantidad }}" required min="0" style="border-radius:10px;">
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
                                                         <label for="fechaAdquisicion{{ $herramienta->id }}" class="form-label" style="font-weight:600; color:#662a5b;">Fecha Adquisición *</label>
                                                         <input type="date" class="form-control" id="fechaAdquisicion{{ $herramienta->id }}" name="fechaAdquisicion" value="{{ $herramienta->fechaAdquisicion }}" required style="border-radius:10px;">
                                                     </div>
+                                                </div>
+                                                <div class="row">
                                                     <div class="col-md-6 mb-3">
                                                         <label for="estadoHerramienta{{ $herramienta->id }}" class="form-label" style="font-weight:600; color:#662a5b;">Estado *</label>
                                                         <select class="form-select" id="estadoHerramienta{{ $herramienta->id }}" name="estadoHerramienta" required style="border-radius:10px;">
@@ -302,7 +352,7 @@
 
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center" style="padding:3rem; color:#999;">
+                                <td colspan="8" class="text-center" style="padding:3rem; color:#999;">
                                     <svg class="icon mb-3" style="width:48px; height:48px; color:#ccc;">
                                         <use xlink:href="{{ asset('icons/coreui.svg#cil-wrench') }}"></use>
                                     </svg>
@@ -372,12 +422,21 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
+                            <label for="cantidad" class="form-label" style="font-weight:600; color:#662a5b;">Cantidad *</label>
+                            <input type="number" class="form-control @error('cantidad') is-invalid @enderror" id="cantidad" name="cantidad" value="{{ old('cantidad', 1) }}" required min="1" style="border-radius:10px;">
+                            @error('cantidad')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <label for="fechaAdquisicion" class="form-label" style="font-weight:600; color:#662a5b;">Fecha de Adquisición *</label>
                             <input type="date" class="form-control @error('fechaAdquisicion') is-invalid @enderror" id="fechaAdquisicion" name="fechaAdquisicion" value="{{ old('fechaAdquisicion') }}" required style="border-radius:10px;">
                             @error('fechaAdquisicion')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="estadoHerramienta" class="form-label" style="font-weight:600; color:#662a5b;">Estado *</label>
                             <select class="form-select @error('estadoHerramienta') is-invalid @enderror" id="estadoHerramienta" name="estadoHerramienta" required style="border-radius:10px;">

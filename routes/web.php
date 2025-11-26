@@ -87,5 +87,8 @@ Route::middleware('auth')->group(function () {
     // Rutas de asignación herramienta-estilista
     Route::resource('asignacion_herramientas', \App\Http\Controllers\AsignacionHerramientaController::class);
 
+    // Rutas de incidencias
+    Route::resource('incidencias', \App\Http\Controllers\IncidenciaController::class);
+
     Route::resource('books', BookController::class)->only('index');
 });

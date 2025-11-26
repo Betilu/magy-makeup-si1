@@ -36,12 +36,26 @@
 <div class="row">
     <div class="col-md-6 mb-3">
         <label class="form-label">Estado entrega</label>
-        <input type="text" name="estadoEntrega" value="{{ old('estadoEntrega', $item->estadoEntrega ?? '') }}" class="form-control asignacion-herramienta-estadoEntrega" required maxlength="255">
+        <select name="estadoEntrega" class="form-select asignacion-herramienta-estadoEntrega" required>
+            <option value="">-- Seleccione --</option>
+            @foreach(App\Models\AsignacionHerramienta::getEstados() as $value => $label)
+                <option value="{{ $value }}" {{ old('estadoEntrega', isset($item) ? $item->estadoEntrega : '') === $value ? 'selected' : '' }}>
+                    {{ $label }}
+                </option>
+            @endforeach
+        </select>
         @error('estadoEntrega') <div class="text-danger small">{{ $message }}</div> @enderror
     </div>
     <div class="col-md-6 mb-3">
         <label class="form-label">Estado devolución</label>
-        <input type="text" name="estadoDevolucion" value="{{ old('estadoDevolucion', $item->estadoDevolucion ?? '') }}" class="form-control asignacion-herramienta-estadoDevolucion" maxlength="255">
+        <select name="estadoDevolucion" class="form-select asignacion-herramienta-estadoDevolucion">
+            <option value="">-- Seleccione --</option>
+            @foreach(App\Models\AsignacionHerramienta::getEstados() as $value => $label)
+                <option value="{{ $value }}" {{ old('estadoDevolucion', isset($item) ? $item->estadoDevolucion : '') === $value ? 'selected' : '' }}>
+                    {{ $label }}
+                </option>
+            @endforeach
+        </select>
         @error('estadoDevolucion') <div class="text-danger small">{{ $message }}</div> @enderror
     </div>
 </div>

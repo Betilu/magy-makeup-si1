@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Client;
 use App\Models\Estilista;
 use App\Models\Servicio;
+use App\Models\Producto;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -224,6 +225,11 @@ class CitaController extends Controller
             // Actualizar total de comisiones del estilista usando increment
             $estilista->increment('total_comisiones', $validated['comision_estilista']);
 
+            // Si el estado es "confirmada", descontar productos del stock
+            if ($validated['estado'] === 'confirmada') {
+                $this->descontarStockProductos($servicio->id);
+            }
+
             DB::commit();
 
             // Registrar en bitácora
@@ -289,6 +295,7 @@ class CitaController extends Controller
             // Si cambiaron el servicio o estilista, recalcular comisiones
             $servicioAnterior = $cita->servicio;
             $estilistaAnterior = $cita->estilista;
+            $estadoAnterior = $cita->estado; // Guardar estado anterior
 
             $servicio = Servicio::findOrFail($validated['servicio_id']);
             $estilista = Estilista::findOrFail($validated['estilista_id']);
@@ -366,6 +373,11 @@ class CitaController extends Controller
             // Sumar nueva comisión al estilista
             $estilista->increment('total_comisiones', $validated['comision_estilista']);
 
+            // Si el estado cambió a "confirmada", descontar productos del stock
+            if ($validated['estado'] === 'confirmada' && $estadoAnterior !== 'confirmada') {
+                $this->descontarStockProductos($servicio->id);
+            }
+
             DB::commit();
 
             // Registrar en bitácora
@@ -428,6 +440,52 @@ class CitaController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Error al eliminar la cita: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Descontar stock de productos asociados a un servicio
+     */
+    private function descontarStockProductos($servicioId)
+    {
+        try {
+            // Obtener el servicio con sus productos relacionados
+            $servicio = Servicio::with('productos')->find($servicioId);
+
+            if (!$servicio) {
+                Log::warning("Servicio no encontrado para descontar stock: ID {$servicioId}");
+                return;
+            }
+
+            // Iterar sobre los productos del servicio
+            foreach ($servicio->productos as $producto) {
+                $cantidad = $producto->pivot->cantidad ?? 1;
+
+                // Verificar que hay suficiente stock
+                if ($producto->stockActual >= $cantidad) {
+                    // Descontar del stock
+                    $producto->decrement('stockActual', $cantidad);
+
+                    Log::info("Stock descontado:", [
+                        'servicio_id' => $servicioId,
+                        'servicio_nombre' => $servicio->nombre,
+                        'producto_id' => $producto->id,
+                        'producto_nombre' => $producto->nombre,
+                        'cantidad_descontada' => $cantidad,
+                        'stock_anterior' => $producto->stockActual + $cantidad,
+                        'stock_actual' => $producto->stockActual
+                    ]);
+                } else {
+                    Log::warning("Stock insuficiente para descontar:", [
+                        'producto_id' => $producto->id,
+                        'producto_nombre' => $producto->nombre,
+                        'stock_actual' => $producto->stockActual,
+                        'cantidad_requerida' => $cantidad
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error("Error al descontar stock de productos: " . $e->getMessage());
         }
     }
 }
