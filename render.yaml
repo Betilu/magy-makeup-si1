@@ -1,0 +1,74 @@
+services:
+  # Web Service
+  - type: web
+    name: magy-makeup-app
+    env: docker
+    region: oregon # Cambia según tu preferencia: oregon, frankfurt, singapore, etc.
+    plan: starter # Cambia a: starter, standard, pro, etc.
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: APP_NAME
+        value: MagyMakeup
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        sync: false # Render asignará automáticamente la URL
+      - key: APP_KEY
+        generateValue: true
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: info
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        fromDatabase:
+          name: magy-makeup-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: magy-makeup-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: magy-makeup-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: magy-makeup-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: magy-makeup-db
+          property: password
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: MAIL_MAILER
+        value: smtp
+      - key: MAIL_HOST
+        value: smtp.mailtrap.io
+      - key: MAIL_PORT
+        value: 2525
+      - key: STRIPE_KEY
+        sync: false
+      - key: STRIPE_SECRET
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+    healthCheckPath: /
+    autoDeploy: true
+
+  # Database Service
+databases:
+  - name: magy-makeup-db
+    databaseName: magy_make_up
+    user: magy_user
+    region: oregon # Debe coincidir con el region del web service
+    plan: starter # Cambia según necesites: starter, standard, pro, etc.

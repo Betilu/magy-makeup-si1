@@ -1,0 +1,62 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Environment files
+.env
+.env.backup
+.env.production
+
+# PHP dependencies
+/vendor
+
+# Node modules and build files
+/node_modules
+/public/hot
+/public/storage
+
+# Laravel cache
+/storage/*.key
+/storage/logs
+/storage/framework/cache/**
+/storage/framework/sessions/**
+/storage/framework/views/**
+
+# Testing
+/.phpunit.cache
+/tests
+/.pest
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Documentation
+/docs
+README.md
+
+# Composer files (keep only composer.json and composer.lock)
+/composer.phar
+
+# NPM files (keep only package.json and package-lock.json)
+npm-debug.log
+yarn-error.log
+
+# Build artifacts
+/public/build
+
+# Laravel specific
+Homestead.json
+Homestead.yaml
+auth.json
+
+# Docker files (exclude from the image)
+docker-compose.yml
+docker-compose.*.yml
+Dockerfile
+.dockerignore

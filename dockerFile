@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y \
     unzip \
     nginx \
     supervisor \
-    libzip-dev
+    libzip-dev \
+    netcat-openbsd
 
 # Limpiar caché para reducir tamaño de imagen
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -36,8 +37,14 @@ COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Copiar el código de la aplicación
 COPY . .
 
+# Copiar .env.example a .env si no existe
+RUN if [ ! -f .env ]; then cp .env.example .env; fi
+
 # Instalar dependencias de PHP (Producción)
 RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Generar application key
+RUN php artisan key:generate --no-interaction
 
 # Instalar dependencias de Node y compilar assets
 RUN npm install && npm run build
@@ -52,6 +59,9 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Exponer el puerto 80
 EXPOSE 80
+
+# Crear variable de entorno para el puerto (Render usa PORT)
+ENV PORT=80
 
 # Comando de inicio
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
