@@ -24,6 +24,7 @@ class ServicioProducto extends Model
     protected $fillable = [
         'servicio_id',
         'producto_id',
+        'cantidad',
     ];
 
     /**
@@ -39,4 +40,3 @@ class ServicioProducto extends Model
         return $this->belongsTo(Producto::class, 'producto_id');
     }
 }
- 

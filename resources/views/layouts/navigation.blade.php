@@ -148,6 +148,16 @@
                     </a>
                 </li>
             @endcan
+            @if(auth()->user()->can('ver incidencias') || auth()->user()->can('reportar incidencia'))
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('incidencias.index') }}" style="border-radius:8px; margin:0.25rem 0.5rem; padding-left:2.5rem; transition:all 0.3s;">
+                        <svg class="nav-icon" style="color:#d499b3; width:18px; height:18px;">
+                            <use xlink:href="{{ asset('icons/coreui.svg#cil-warning') }}"></use>
+                        </svg>
+                        {{ __('Incidencias') }}
+                    </a>
+                </li>
+            @endif
 
         </ul>
     </li>
@@ -239,7 +249,7 @@
                     </a>
                 </li>
             @endcan
-           
+
         </ul>
     </li>
 

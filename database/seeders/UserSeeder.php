@@ -34,7 +34,14 @@ class UserSeeder extends Seeder
         Permission::create(['name' => 'crear citas']);
         Permission::create(['name' => 'editar citas']);
         Permission::create(['name' => 'eliminar citas']);
-       
+
+        // Permisos para incidencias
+        Permission::create(['name' => 'ver incidencias']);
+        Permission::create(['name' => 'crear incidencias']);
+        Permission::create(['name' => 'editar incidencias']);
+        Permission::create(['name' => 'eliminar incidencias']);
+        Permission::create(['name' => 'reportar incidencia']);
+
 
         $adminUser = User::query()->create([
             'name' => 'admin',
@@ -54,7 +61,7 @@ class UserSeeder extends Seeder
             'password' => '12345',
             'email_verified_at' => now()
         ]);
-        
+
         $roleRecepcionista = Role::create(['name' => 'recepcionista']);
         $recepcionistaUser->assignRole($roleRecepcionista);
         $roleRecepcionista->syncPermissions(['ver citas', 'editar citas']);
@@ -70,19 +77,20 @@ class UserSeeder extends Seeder
         $roleCliente = Role::create(['name' => 'cliente']);
         $clienteUser->assignRole($roleCliente);
         $roleCliente->syncPermissions(['ver citas', 'crear citas']);
-        
+
         // ---------------------------------------------------------------
 
         $estilistaUser = User::query()->create([
             'name' => 'estilista',
-            'email' => 'estilista@cliente.com',
+            'email' => 'estilista@gmail.com',
             'password' => '12345',
             'email_verified_at' => now()
         ]);
 
         $roleEstilista = Role::create(['name' => 'estilista']);
-        $estilistaUser->assignRole($roleEstilista);        
-        
+        $estilistaUser->assignRole($roleEstilista);
+        $roleEstilista->syncPermissions(['ver incidencias', 'reportar incidencia', 'crear incidencias', 'editar incidencias', 'eliminar incidencias']);
+
         // ---------------------------------------------------------------
         // Crear más usuarios clientes para el seeder
         $clientes = [

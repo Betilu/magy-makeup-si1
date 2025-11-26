@@ -36,6 +36,7 @@ class ServicioProductoController extends Controller
         $data = $request->validate([
             'servicio_id' => 'required|integer|exists:servicios,id',
             'producto_id' => 'required|integer|exists:productos,id',
+            'cantidad' => 'required|integer|min:1',
         ]);
 
         ServicioProductoModel::create($data);
@@ -73,6 +74,7 @@ class ServicioProductoController extends Controller
         $data = $request->validate([
             'servicio_id' => 'required|integer|exists:servicios,id',
             'producto_id' => 'required|integer|exists:productos,id',
+            'cantidad' => 'required|integer|min:1',
         ]);
 
         $item->update($data);

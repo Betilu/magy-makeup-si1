@@ -35,6 +35,7 @@ class HerramientaController extends Controller
             'tipo' => 'required|string|max:255',
             'marca' => 'required|string|max:255',
             'modelo' => 'required|string|max:255',
+            'cantidad' => 'required|integer|min:1',
             'fechaAdquisicion' => 'required|date',
             'estadoHerramienta' => 'required|in:Disponible,En uso,En mantenimiento,Fuera de servicio',
             'observacion' => 'nullable|string|max:1000',
@@ -42,7 +43,7 @@ class HerramientaController extends Controller
 
         try {
             Herramienta::create($validated);
-            
+
             Log::info('Herramienta creada', [
                 'user_id' => auth()->id(),
                 'herramienta' => $validated['nombre']
@@ -87,6 +88,7 @@ class HerramientaController extends Controller
             'tipo' => 'required|string|max:255',
             'marca' => 'required|string|max:255',
             'modelo' => 'required|string|max:255',
+            'cantidad' => 'required|integer|min:0',
             'fechaAdquisicion' => 'required|date',
             'estadoHerramienta' => 'required|in:Disponible,En uso,En mantenimiento,Fuera de servicio',
             'observacion' => 'nullable|string|max:1000',
@@ -94,7 +96,7 @@ class HerramientaController extends Controller
 
         try {
             $herramienta->update($validated);
-            
+
             Log::info('Herramienta actualizada', [
                 'user_id' => auth()->id(),
                 'herramienta_id' => $id,
@@ -118,9 +120,9 @@ class HerramientaController extends Controller
         try {
             $herramienta = Herramienta::findOrFail($id);
             $nombreHerramienta = $herramienta->nombre;
-            
+
             $herramienta->delete();
-            
+
             Log::info('Herramienta eliminada', [
                 'user_id' => auth()->id(),
                 'herramienta_id' => $id,

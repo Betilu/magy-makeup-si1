@@ -53,4 +53,14 @@ class Servicio extends Model
     {
         return $this->belongsToMany(Estilista::class, 'estilista_servicio');
     }
+
+    /**
+     * Relación muchos a muchos con Producto
+     */
+    public function productos()
+    {
+        return $this->belongsToMany(Producto::class, 'servicio_productos')
+            ->withPivot('cantidad')
+            ->withTimestamps();
+    }
 }
