@@ -9,10 +9,12 @@ use Spatie\Permission\Models\Permission;
 use Illuminate\Http\Request;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash; 
+use Illuminate\Support\Facades\Hash;
+use App\Traits\LogsActivity;
 
 class UserController extends Controller
 {
+    use LogsActivity;
     public function __construct()
     {
         $this->authorizeResource(User::class);
@@ -99,7 +101,7 @@ class UserController extends Controller
     {
         $userName = $user->name;
         $userEmail = $user->email;
-        
+
         $user->delete();
 
         // Registrar en bitácora
@@ -196,10 +198,10 @@ class UserController extends Controller
     {
         $roles = Role::orderBy('name')->get(['id', 'name']);
         $permissions = Permission::orderBy('name')->get(['id', 'name']);
-        
+
         $userRoleIds = $user->roles->pluck('id')->toArray();
         $userPermissionIds = $user->permissions->pluck('id')->toArray();
-        
+
         $rolesData = $roles->map(function ($role) use ($userRoleIds) {
             return [
                 'id' => $role->id,
@@ -207,7 +209,7 @@ class UserController extends Controller
                 'assigned' => in_array($role->id, $userRoleIds)
             ];
         });
-        
+
         $permissionsData = $permissions->map(function ($permission) use ($userPermissionIds) {
             return [
                 'id' => $permission->id,
@@ -215,7 +217,7 @@ class UserController extends Controller
                 'assigned' => in_array($permission->id, $userPermissionIds)
             ];
         });
-        
+
         return response()->json([
             'roles' => $rolesData,
             'permissions' => $permissionsData

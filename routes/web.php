@@ -29,7 +29,7 @@ Route::middleware('auth')->group(function () {
 
     // Rutas de usuarios
     Route::resource('users', UserController::class);
-    
+
     // Rutas específicas para usuarios
     Route::get('users/{user}/roles-permissions', [UserController::class, 'editRoles'])
         ->name('users.roles.edit');
@@ -38,10 +38,10 @@ Route::middleware('auth')->group(function () {
     Route::get('users/{user}/roles/data', [UserController::class, 'getRolesData'])
         ->name('users.roles.data');
     Route::get('bitacora', [UserController::class, 'bitacora'])->name('bitacora.index');
-    
+
     // Rutas de roles
     Route::resource('roles', RoleController::class);
-    
+
     // Rutas de permisos
     Route::resource('permissions', PermissionController::class);
 
@@ -60,6 +60,8 @@ Route::middleware('auth')->group(function () {
 
     // Rutas de citas
     Route::resource('citas', CitaController::class);
+    Route::get('citas/servicios-estilista/{estilistaId}', [CitaController::class, 'getServiciosPorEstilista'])
+        ->name('citas.servicios-estilista');
 
      // Rutas de estilistas
     Route::resource('estilistas', EstilistaController::class);

@@ -55,4 +55,12 @@ class Estilista extends Model
     {
         return $this->hasMany(Cita::class);
     }
+
+    /**
+     * Relación muchos a muchos con Servicio
+     */
+    public function servicios()
+    {
+        return $this->belongsToMany(Servicio::class, 'estilista_servicio');
+    }
 }
