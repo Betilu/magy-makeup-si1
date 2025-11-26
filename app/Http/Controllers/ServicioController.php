@@ -34,6 +34,8 @@ class ServicioController extends Controller
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
             'duracion' => 'required|string|max:255',
+            'precio_servicio' => 'required|numeric|min:0',
+            'estado' => 'required|string',
         ]);
 
         ServicioModel::create($data);
@@ -71,6 +73,8 @@ class ServicioController extends Controller
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
             'duracion' => 'required|string|max:255',
+            'precio_servicio' => 'required|numeric|min:0',
+            'estado' => 'required|string',
         ]);
 
         $servicio->update($data);

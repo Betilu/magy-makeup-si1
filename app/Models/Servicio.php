@@ -31,6 +31,8 @@ class Servicio extends Model
         'nombre',
         'descripcion',
         'duracion',
+        'precio_servicio',
+        'estado'
     ];
 
     /**

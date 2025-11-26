@@ -75,9 +75,9 @@ class EstilistaController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'horario_id' => 'required|exists:horarios,id',
             'calificacion' => 'required|integer|min:0|max:5',
-            'comision' => 'required|numeric|min:0',
             'disponibilidad' => 'required|string|max:255',
             'especialidad' => 'required|string|max:255',
+            'estado' => 'required|in:nuevo,antiguo',
         ]);
 
         DB::beginTransaction();
@@ -95,21 +95,26 @@ class EstilistaController extends Controller
                 $user->assignRole($estilistaRole);
             }
 
+            // Calcular comisión automáticamente según el estado
+            $porcentajeComision = $data['estado'] === 'antiguo' ? 50 : 40;
+
             // Crear estilista
             $estilista = new Estilista();
             $estilista->user_id = $user->id;
             $estilista->horario_id = $data['horario_id'];
             $estilista->calificacion = $data['calificacion'];
-            $estilista->comision = $data['comision'];
+            $estilista->comision = $porcentajeComision;
             $estilista->disponibilidad = $data['disponibilidad'];
             $estilista->especialidad = $data['especialidad'];
+            $estilista->estado = $data['estado'];
+            $estilista->total_comisiones = 0;
             $estilista->save();
 
             // Registrar en bitácora
             ActivityLog::create([
                 'user_id' => Auth::id(),
                 'action' => 'Creación de estilista',
-                'description' => 'Estilista creado: ' . $user->name . ' (' . $user->email . ')',
+                'description' => 'Estilista creado: ' . $user->name . ' (' . $user->email . ') - Estado: ' . $data['estado'] . ' - Comisión: ' . $porcentajeComision . '%',
                 'ip_address' => $request->ip() ?? 'No disponible',
                 'browser' => $request->header('user-agent') ?? 'No disponible',
             ]);
@@ -172,9 +177,9 @@ class EstilistaController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
             'horario_id' => 'required|exists:horarios,id',
             'calificacion' => 'required|integer|min:0|max:5',
-            'comision' => 'required|numeric|min:0',
             'disponibilidad' => 'required|string|max:255',
             'especialidad' => 'required|string|max:255',
+            'estado' => 'required|in:nuevo,antiguo',
         ]);
 
         DB::beginTransaction();
@@ -192,19 +197,23 @@ class EstilistaController extends Controller
 
             $user->update($updateUserData);
 
+            // Calcular comisión automáticamente según el estado
+            $porcentajeComision = $data['estado'] === 'antiguo' ? 50 : 40;
+
             // Actualizar estilista
             $estilista->horario_id = $data['horario_id'];
             $estilista->calificacion = $data['calificacion'];
-            $estilista->comision = $data['comision'];
+            $estilista->comision = $porcentajeComision;
             $estilista->disponibilidad = $data['disponibilidad'];
             $estilista->especialidad = $data['especialidad'];
+            $estilista->estado = $data['estado'];
             $estilista->save();
 
             // Registrar en bitácora
             ActivityLog::create([
                 'user_id' => Auth::id(),
                 'action' => 'Actualización de estilista',
-                'description' => 'Estilista actualizado: ' . $user->name . ' (' . $user->email . ')',
+                'description' => 'Estilista actualizado: ' . $user->name . ' (' . $user->email . ') - Estado: ' . $data['estado'] . ' - Comisión: ' . $porcentajeComision . '%',
                 'ip_address' => $request->ip() ?? 'No disponible',
                 'browser' => $request->header('user-agent') ?? 'No disponible',
             ]);

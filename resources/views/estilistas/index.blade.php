@@ -121,10 +121,11 @@
                             {{-- <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">ID</th> --}}
                             <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">Nombre</th>
                             <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">Email</th>
+                            <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">Estado</th>
                             <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">Horario</th>
                             <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">Calificación</th>
-                            <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">Comisión</th>
-                            <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">Disponibilidad</th>
+                            <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">Comisión %</th>
+                            <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">Total Ganado</th>
                             <th style="border:none; padding:1rem; font-weight:600; color:#662a5b;">Especialidad</th>
                             <th style="border:none; padding:1rem; font-weight:600; color:#662a5b; text-align:center;">Acciones</th>
                         </tr>
@@ -135,6 +136,12 @@
                                 {{-- <td style="padding:1rem; vertical-align:middle;">{{ $estilista->id }}</td> --}}
                                 <td style="padding:1rem; vertical-align:middle;">{{ $estilista->user->name }}</td>
                                 <td style="padding:1rem; vertical-align:middle;">{{ $estilista->user->email }}</td>
+                                <td style="padding:1rem; vertical-align:middle;">
+                                    <span class="badge {{ $estilista->estado === 'antiguo' ? 'bg-primary' : 'bg-secondary' }}" 
+                                          style="padding:0.5rem 1rem; border-radius:8px; text-transform:capitalize;">
+                                        {{ ucfirst($estilista->estado) }}
+                                    </span>
+                                </td>
                                 <td style="padding:1rem; vertical-align:middle;">
                                     @if($estilista->horario)
                                         <span class="badge bg-info" style="padding:0.5rem 1rem; border-radius:8px;">
@@ -155,11 +162,15 @@
                                     </div>
                                 </td>
                                 <td style="padding:1rem; vertical-align:middle;">
-                                    <span class="badge bg-success" style="padding:0.5rem 1rem; border-radius:8px;">
-                                        ${{ number_format($estilista->comision, 2) }}
+                                    <span class="badge bg-info" style="padding:0.5rem 1rem; border-radius:8px; font-size:1rem;">
+                                        {{ $estilista->comision }}%
                                     </span>
                                 </td>
-                                <td style="padding:1rem; vertical-align:middle;">{{ $estilista->disponibilidad }}</td>
+                                <td style="padding:1rem; vertical-align:middle;">
+                                    <strong class="text-success" style="font-size:1.1rem;">
+                                        ${{ number_format($estilista->total_comisiones ?? 0, 2) }}
+                                    </strong>
+                                </td>
                                 <td style="padding:1rem; vertical-align:middle;">{{ $estilista->especialidad }}</td>
                                 <td style="padding:1rem; vertical-align:middle; text-align:center;">
                                     <div class="btn-group" role="group">
@@ -318,14 +329,30 @@
                                                     </select>
                                                 </div>
                                                 <div class="row">
-                                                    <div class="col-md-6 mb-3">
+                                                    <div class="col-md-4 mb-3">
                                                         <label class="form-label" style="font-weight:600; color:#662a5b;">Calificación (0-5) *</label>
                                                         <input type="number" name="calificacion" class="form-control" value="{{ $estilista->calificacion }}" min="0" max="5" required style="border-radius:10px;">
                                                     </div>
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="form-label" style="font-weight:600; color:#662a5b;">Comisión *</label>
-                                                        <input type="number" step="0.01" name="comision" class="form-control" value="{{ $estilista->comision }}" required style="border-radius:10px;">
+                                                    <div class="col-md-4 mb-3">
+                                                        <label class="form-label" style="font-weight:600; color:#662a5b;">Estado del Estilista *</label>
+                                                        <select name="estado" class="form-select estado-edit-select" required style="border-radius:10px;">
+                                                            <option value="">Seleccionar...</option>
+                                                            <option value="nuevo" {{ $estilista->estado == 'nuevo' ? 'selected' : '' }}>Nuevo (40% comisión)</option>
+                                                            <option value="antiguo" {{ $estilista->estado == 'antiguo' ? 'selected' : '' }}>Antiguo (50% comisión)</option>
+                                                        </select>
                                                     </div>
+                                                    <div class="col-md-4 mb-3">
+                                                        <label class="form-label" style="font-weight:600; color:#662a5b;">Comisión Asignada</label>
+                                                        <div class="card bg-light" style="border-radius:10px;">
+                                                            <div class="card-body text-center py-2">
+                                                                <h4 class="mb-0 text-success comision-edit-display">{{ $estilista->comision }}%</h4>
+                                                                <small class="text-muted">Automático</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="alert alert-info" style="border-radius:10px;">
+                                                    <strong>Total Ganado:</strong> ${{ number_format($estilista->total_comisiones ?? 0, 2) }}
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
@@ -487,7 +514,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label for="modal_calificacion" class="form-label" style="font-weight:600; color:#662a5b;">Calificación (0-5) *</label>
                             <input type="number" name="calificacion" id="modal_calificacion" class="form-control @error('calificacion') is-invalid @enderror" value="{{ old('calificacion') }}" min="0" max="5" required style="border-radius:10px;">
                             @error('calificacion')
@@ -495,12 +522,26 @@
                             @enderror
                         </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label for="modal_comision" class="form-label" style="font-weight:600; color:#662a5b;">Comisión *</label>
-                            <input type="number" step="0.01" name="comision" id="modal_comision" class="form-control @error('comision') is-invalid @enderror" value="{{ old('comision') }}" required style="border-radius:10px;">
-                            @error('comision')
+                        <div class="col-md-4 mb-3">
+                            <label for="modal_estado" class="form-label" style="font-weight:600; color:#662a5b;">Estado del Estilista *</label>
+                            <select name="estado" id="modal_estado" class="form-select @error('estado') is-invalid @enderror" required style="border-radius:10px;">
+                                <option value="">Seleccionar...</option>
+                                <option value="nuevo" {{ old('estado') == 'nuevo' ? 'selected' : '' }}>Nuevo (40% comisión)</option>
+                                <option value="antiguo" {{ old('estado') == 'antiguo' ? 'selected' : '' }}>Antiguo (50% comisión)</option>
+                            </select>
+                            @error('estado')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" style="font-weight:600; color:#662a5b;">Comisión Asignada</label>
+                            <div class="card bg-light" style="border-radius:10px;">
+                                <div class="card-body text-center py-2">
+                                    <h4 class="mb-0 text-success" id="comisionDisplay">-- %</h4>
+                                    <small class="text-muted">Automático</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -546,4 +587,57 @@
     });
 </script>
 @endif
+
+{{-- Script para actualizar comisión automáticamente --}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal de creación
+    const estadoSelect = document.getElementById('modal_estado');
+    const comisionDisplay = document.getElementById('comisionDisplay');
+
+    if (estadoSelect && comisionDisplay) {
+        estadoSelect.addEventListener('change', function() {
+            const estado = this.value;
+            if (estado === 'nuevo') {
+                comisionDisplay.textContent = '40%';
+                comisionDisplay.classList.remove('text-primary');
+                comisionDisplay.classList.add('text-success');
+            } else if (estado === 'antiguo') {
+                comisionDisplay.textContent = '50%';
+                comisionDisplay.classList.remove('text-success');
+                comisionDisplay.classList.add('text-primary');
+            } else {
+                comisionDisplay.textContent = '-- %';
+                comisionDisplay.classList.remove('text-success', 'text-primary');
+            }
+        });
+    }
+
+    // Modales de edición
+    const estadoEditSelects = document.querySelectorAll('.estado-edit-select');
+    estadoEditSelects.forEach(function(select) {
+        select.addEventListener('change', function() {
+            const modal = this.closest('.modal');
+            const comisionDisplay = modal.querySelector('.comision-edit-display');
+            const estado = this.value;
+            
+            if (comisionDisplay) {
+                if (estado === 'nuevo') {
+                    comisionDisplay.textContent = '40%';
+                    comisionDisplay.classList.remove('text-primary');
+                    comisionDisplay.classList.add('text-success');
+                } else if (estado === 'antiguo') {
+                    comisionDisplay.textContent = '50%';
+                    comisionDisplay.classList.remove('text-success');
+                    comisionDisplay.classList.add('text-primary');
+                } else {
+                    comisionDisplay.textContent = '-- %';
+                    comisionDisplay.classList.remove('text-success', 'text-primary');
+                }
+            }
+        });
+    });
+});
+</script>
+
 @endsection

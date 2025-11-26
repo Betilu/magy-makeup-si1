@@ -109,6 +109,7 @@
         </li>
     @endif
 
+    @if(!auth()->user()->hasRole('cliente') || auth()->user()->hasRole('super-admin'))
     <li class="nav-group" style="margin:0.5rem 0;">
         <a class="nav-link nav-group-toggle" href="#" style="border-radius:8px; margin:0 0.5rem; transition:all 0.3s;">
             <svg class="nav-icon" style="color:#e6b3cc;">
@@ -150,6 +151,7 @@
 
         </ul>
     </li>
+    @endif
 
     <li class="nav-group" style="margin:0.5rem 0;">
         <a class="nav-link nav-group-toggle" href="#" style="border-radius:8px; margin:0 0.5rem; transition:all 0.3s;">
@@ -182,7 +184,7 @@
                 </li>
             @endcan
 
-            @can('ver citas')
+            @if(auth()->user()->can('ver citas') || auth()->user()->can('crear citas'))
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('citas.index') }}" style="border-radius:8px; margin:0.25rem 0.5rem; padding-left:2.5rem; transition:all 0.3s;">
                         <svg class="nav-icon" style="color:#d499b3; width:18px; height:18px;">
@@ -191,7 +193,7 @@
                         {{ __('Citas') }}
                     </a>
                 </li>
-            @endcan
+            @endif
 
             @can('ver notificaciones')
                 <li class="nav-item">
