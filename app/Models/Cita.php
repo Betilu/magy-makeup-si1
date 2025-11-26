@@ -54,6 +54,12 @@ class Cita extends Model
         return $this->hasMany(Notificacion::class);
     }
 
+    // 🔗 Relación: una cita puede tener múltiples pagos
+    public function pagos()
+    {
+        return $this->hasMany(Pago::class);
+    }
+
     // 🔗 Relación: obtener el cliente a través del usuario
     // (asumiendo que el user de la cita es un cliente)
     public function client()
@@ -66,5 +72,52 @@ class Cita extends Model
             'user_id',      // Local key en la tabla citas
             'id'            // Local key en la tabla users
         );
+    }
+
+    /**
+     * Verificar si la cita tiene pagos exitosos
+     */
+    public function tienePagosExitosos(): bool
+    {
+        return $this->pagos()->where('estado', 'succeeded')->exists();
+    }
+
+    /**
+     * Obtener el total pagado de la cita
+     */
+    public function totalPagado(): float
+    {
+        return (float) $this->pagos()
+            ->where('estado', 'succeeded')
+            ->sum('monto');
+    }
+
+    /**
+     * Obtener el saldo pendiente de la cita
+     */
+    public function saldoPendiente(): float
+    {
+        $total = (float) $this->precio_total;
+        $pagado = $this->totalPagado();
+        return max(0, $total - $pagado);
+    }
+
+    /**
+     * Verificar si la cita está completamente pagada
+     */
+    public function estaCompletamentePagada(): bool
+    {
+        return $this->saldoPendiente() <= 0.01; // Margen de error por decimales
+    }
+
+    /**
+     * Obtener el último pago exitoso
+     */
+    public function ultimoPagoExitoso()
+    {
+        return $this->pagos()
+            ->where('estado', 'succeeded')
+            ->latest()
+            ->first();
     }
 }
