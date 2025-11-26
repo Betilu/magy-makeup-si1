@@ -1,20 +1,26 @@
 #!/bin/sh
 
-# Salir si ocurre algún error
+# Salir inmediatamente si un comando falla
 set -e
 
-echo "🚀 Iniciando despliegue en Render..."
+echo "Running entrypoint script..."
 
-# Caché de configuración y rutas para optimizar
-echo "Optimizing Laravel..."
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
-# Ejecutar migraciones (IMPORTANTE: Solo si tienes la base de datos conectada)
-# Render detectará las variables de entorno de la BD automáticamente si las vinculaste.
-echo "Running Migrations..."
+# Ejecutar Migraciones (ESTO ES LO QUE PREVIENE EL ERROR DE BASE DE DATOS)
+echo "Running database migrations..."
 php artisan migrate --force
 
-echo "Starting Supervisor..."
-exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+# 2. Ejecutar los seeders (cargar datos iniciales)
+echo "Running database seeders..."
+php artisan db:seed --force
+
+# Optimizar la aplicación para producción
+echo "Caching configuration and routes..."
+php artisan config:cache
+php artisan route:cache
+
+# Inicia PHP-FPM en segundo plano
+echo "Starting PHP-FPM..."
+/usr/local/sbin/php-fpm -D
+
+# Ejecuta el comando pasado a CMD (en este caso, iniciar NGINX)
+exec "$@"
