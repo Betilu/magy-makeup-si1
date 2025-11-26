@@ -11,9 +11,11 @@ use App\Models\Servicio;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Traits\LogsActivity;
 
 class CitaController extends Controller
 {
+    use LogsActivity;
     /**
      * Obtener lista de clientes (usuarios con registro en tabla clients)
      */
@@ -55,6 +57,30 @@ class CitaController extends Controller
         $servicios = Servicio::where('estado', 'activo')->get();
 
         return view('citas.index', compact('citas', 'clientes', 'estilistas', 'servicios'));
+    }
+
+    /**
+     * Obtener servicios de una estilista específica (AJAX)
+     */
+    public function getServiciosPorEstilista($estilistaId)
+    {
+        $estilista = Estilista::with('servicios')->findOrFail($estilistaId);
+
+        // Si la estilista no tiene servicios asignados, devolver todos los servicios activos
+        if ($estilista->servicios->isEmpty()) {
+            $servicios = Servicio::where('estado', 'activo')->get();
+        } else {
+            $servicios = $estilista->servicios()->where('estado', 'activo')->get();
+        }
+
+        return response()->json([
+            'servicios' => $servicios,
+            'estilista' => [
+                'id' => $estilista->id,
+                'nombre' => $estilista->user->name,
+                'comision' => $estilista->porcentaje_comision
+            ]
+        ]);
     }
 
     /**
@@ -113,7 +139,7 @@ class CitaController extends Controller
             $citasExistentes = Cita::with('servicio')
                 ->where('estilista_id', $validated['estilista_id'])
                 ->where('fecha', $validated['fecha'])
-                ->where('estado', '!=', 'cancelada')
+                ->whereIn('estado', ['pendiente', 'confirmada']) // Solo verificar citas pendientes o confirmadas
                 ->get();
 
             $hayConflicto = false;
@@ -122,6 +148,7 @@ class CitaController extends Controller
             // Log para depuración
             Log::info("Verificando conflictos para nueva cita:", [
                 'estilista_id' => $validated['estilista_id'],
+                'servicio_id' => $validated['servicio_id'],
                 'fecha' => $validated['fecha'],
                 'hora_inicio' => $horaInicio,
                 'hora_fin' => $horaFinNueva,
@@ -170,12 +197,14 @@ class CitaController extends Controller
             if ($hayConflicto) {
                 DB::rollBack();
 
-                $mensajeError = 'La estilista ya tiene una cita en ese horario';
+                $mensajeError = '🚫 OCUPADO: La estilista ya tiene una cita';
                 if ($citaConflictiva) {
                     $horaInicioConflicto = $citaConflictiva->hora;
                     $duracionConflicto = (int) $citaConflictiva->servicio->duracion;
                     $horaFinConflicto = date('H:i', strtotime($horaInicioConflicto . ' +' . $duracionConflicto . ' minutes'));
-                    $mensajeError .= " (ocupada de {$horaInicioConflicto} a {$horaFinConflicto})";
+                    $servicioConflicto = $citaConflictiva->servicio->nombre;
+                    $estadoConflicto = ucfirst($citaConflictiva->estado);
+                    $mensajeError .= " {$estadoConflicto} en este horario ({$horaInicioConflicto} a {$horaFinConflicto}) con el servicio: {$servicioConflicto}";
                 }
                 $mensajeError .= '. Por favor, selecciona otro horario.';
 
@@ -197,6 +226,12 @@ class CitaController extends Controller
 
             DB::commit();
 
+            // Registrar en bitácora
+            $this->logActivity(
+                'Crear Cita',
+                "{$this->getCurrentUserName()} ({$this->getCurrentUserRole()}) creó una cita para {$cita->user->name} con {$estilista->user->name} - Servicio: {$servicio->nombre} - Fecha: {$cita->fecha} {$cita->hora} - Estado: {$cita->estado}"
+            );
+
             return redirect()->route('citas.index')->with('success', 'Cita creada correctamente');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -209,8 +244,15 @@ class CitaController extends Controller
      */
     public function show(string $id)
     {
-        $cita = Cita::findOrFail($id);
+        $cita = Cita::with(['user', 'estilista.user', 'servicio'])->findOrFail($id);
         $this->authorize('view', $cita);
+
+        // Registrar en bitácora
+        $this->logActivity(
+            'Ver Cita',
+            "{$this->getCurrentUserName()} ({$this->getCurrentUserRole()}) visualizó la cita #{$cita->id} de {$cita->user->name} - {$cita->servicio->nombre}"
+        );
+
         return view('citas.show', compact('cita'));
     }
 
@@ -263,7 +305,7 @@ class CitaController extends Controller
                 ->where('estilista_id', $validated['estilista_id'])
                 ->where('fecha', $validated['fecha'])
                 ->where('id', '!=', $id) // Excluir la cita que se está editando
-                ->where('estado', '!=', 'cancelada')
+                ->whereIn('estado', ['pendiente', 'confirmada']) // Solo verificar citas pendientes o confirmadas
                 ->get();
 
             $hayConflicto = false;
@@ -292,12 +334,14 @@ class CitaController extends Controller
             if ($hayConflicto) {
                 DB::rollBack();
 
-                $mensajeError = 'La estilista ya tiene una cita en ese horario';
+                $mensajeError = '🚫 OCUPADO: La estilista ya tiene una cita';
                 if ($citaConflictiva) {
                     $horaInicioConflicto = $citaConflictiva->hora;
                     $duracionConflicto = (int) $citaConflictiva->servicio->duracion;
                     $horaFinConflicto = date('H:i', strtotime($horaInicioConflicto . ' +' . $duracionConflicto . ' minutes'));
-                    $mensajeError .= " (ocupada de {$horaInicioConflicto} a {$horaFinConflicto})";
+                    $servicioConflicto = $citaConflictiva->servicio->nombre;
+                    $estadoConflicto = ucfirst($citaConflictiva->estado);
+                    $mensajeError .= " {$estadoConflicto} en este horario ({$horaInicioConflicto} a {$horaFinConflicto}) con el servicio: {$servicioConflicto}";
                 }
                 $mensajeError .= '. Por favor, selecciona otro horario.';
 
@@ -324,6 +368,20 @@ class CitaController extends Controller
 
             DB::commit();
 
+            // Registrar en bitácora
+            $cambios = [];
+            if ($cita->estilista_id != $validated['estilista_id']) $cambios[] = "Estilista";
+            if ($cita->servicio_id != $validated['servicio_id']) $cambios[] = "Servicio";
+            if ($cita->fecha != $validated['fecha']) $cambios[] = "Fecha";
+            if ($cita->hora != $validated['hora']) $cambios[] = "Hora";
+            if ($cita->estado != $validated['estado']) $cambios[] = "Estado ({$cita->estado} → {$validated['estado']})";
+            $cambiosTexto = !empty($cambios) ? 'Cambios: ' . implode(', ', $cambios) : 'Sin cambios significativos';
+
+            $this->logActivity(
+                'Editar Cita',
+                "{$this->getCurrentUserName()} ({$this->getCurrentUserRole()}) editó la cita #{$cita->id} de {$cita->user->name}. {$cambiosTexto}"
+            );
+
             return redirect()->route('citas.index')->with('success', 'Cita actualizada correctamente');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -346,9 +404,25 @@ class CitaController extends Controller
                 $cita->estilista->decrement('total_comisiones', (float) $cita->comision_estilista);
             }
 
+            // Guardar información antes de eliminar
+            $citaInfo = [
+                'id' => $cita->id,
+                'cliente' => $cita->user->name,
+                'servicio' => $cita->servicio->nombre,
+                'fecha' => $cita->fecha,
+                'hora' => $cita->hora,
+                'estado' => $cita->estado
+            ];
+
             $cita->delete();
 
             DB::commit();
+
+            // Registrar en bitácora
+            $this->logActivity(
+                'Eliminar Cita',
+                "{$this->getCurrentUserName()} ({$this->getCurrentUserRole()}) eliminó la cita #{$citaInfo['id']} de {$citaInfo['cliente']} - Servicio: {$citaInfo['servicio']} - Fecha: {$citaInfo['fecha']} {$citaInfo['hora']} - Estado: {$citaInfo['estado']}"
+            );
 
             return redirect()->route('citas.index')->with('success', 'Cita eliminada correctamente');
         } catch (\Exception $e) {

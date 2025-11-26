@@ -10,9 +10,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
+use App\Traits\LogsActivity;
 
 class ClientController extends Controller
 {
+    use LogsActivity;
     /**
      * Display a listing of the resource.
      */
@@ -113,7 +115,7 @@ class ClientController extends Controller
             return redirect()->route('clients.index')->with('success', 'Cliente creado correctamente.');
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             if ($request->wantsJson()) {
                 return response()->json(['error' => 'Error al crear cliente: ' . $e->getMessage()], 500);
             }
@@ -205,7 +207,7 @@ class ClientController extends Controller
             return redirect()->route('clients.index')->with('success', 'Cliente actualizado correctamente.');
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             if ($request->wantsJson()) {
                 return response()->json(['error' => 'Error al actualizar cliente: ' . $e->getMessage()], 500);
             }

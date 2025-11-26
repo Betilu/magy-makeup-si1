@@ -526,6 +526,70 @@ document.addEventListener('DOMContentLoaded', function() {
     const precioServicioEl = document.getElementById('precioServicio');
     const comisionEstilistaEl = document.getElementById('comisionEstilista');
 
+    // Guardar los servicios originales para restaurar
+    let serviciosOriginales = [];
+    if (servicioDrop) {
+        serviciosOriginales = Array.from(servicioDrop.options).map(opt => ({
+            value: opt.value,
+            text: opt.text,
+            precio: opt.dataset.precio
+        }));
+    }
+
+    // Función para cargar servicios de una estilista mediante AJAX
+    function cargarServiciosPorEstilista(estilistaId) {
+        if (!estilistaId) {
+            // Si no hay estilista seleccionada, mostrar todos los servicios
+            restaurarServiciosOriginales();
+            return;
+        }
+
+        fetch(`/citas/servicios-estilista/${estilistaId}`)
+            .then(response => response.json())
+            .then(data => {
+                // Limpiar el dropdown de servicios
+                servicioDrop.innerHTML = '<option value="">Seleccione un servicio...</option>';
+
+                // Agregar los servicios de la estilista
+                data.servicios.forEach(servicio => {
+                    const option = document.createElement('option');
+                    option.value = servicio.id;
+                    option.text = `${servicio.nombre} - $${parseFloat(servicio.precio_servicio).toFixed(2)}`;
+                    option.dataset.precio = servicio.precio_servicio;
+                    servicioDrop.appendChild(option);
+                });
+
+                // Si no hay servicios disponibles para esta estilista
+                if (data.servicios.length === 0) {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.text = 'No hay servicios disponibles para esta estilista';
+                    option.disabled = true;
+                    servicioDrop.appendChild(option);
+                }
+
+                // Actualizar la comisión
+                calcularComision();
+            })
+            .catch(error => {
+                console.error('Error al cargar servicios:', error);
+                restaurarServiciosOriginales();
+            });
+    }
+
+    function restaurarServiciosOriginales() {
+        servicioDrop.innerHTML = '<option value="">Seleccione un servicio...</option>';
+        serviciosOriginales.forEach(servicio => {
+            if (servicio.value) {
+                const option = document.createElement('option');
+                option.value = servicio.value;
+                option.text = servicio.text;
+                option.dataset.precio = servicio.precio;
+                servicioDrop.appendChild(option);
+            }
+        });
+    }
+
     function calcularComision() {
         const servicioOption = servicioDrop.options[servicioDrop.selectedIndex];
         const estilistaOption = estilistaDrop.options[estilistaDrop.selectedIndex];
@@ -535,16 +599,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const comisionPorcentaje = parseFloat(estilistaOption.dataset.comision) || 0;
             const comision = (precio * comisionPorcentaje) / 100;
 
-            precioServicioEl.textContent = '$' + precio.toFixed(2);
-            comisionEstilistaEl.textContent = '$' + comision.toFixed(2);
+            if (precioServicioEl) precioServicioEl.textContent = '$' + precio.toFixed(2);
+            if (comisionEstilistaEl) comisionEstilistaEl.textContent = '$' + comision.toFixed(2);
         } else {
-            precioServicioEl.textContent = '$0.00';
-            comisionEstilistaEl.textContent = '$0.00';
+            if (precioServicioEl) precioServicioEl.textContent = '$0.00';
+            if (comisionEstilistaEl) comisionEstilistaEl.textContent = '$0.00';
         }
     }
 
     if (estilistaDrop && servicioDrop) {
-        estilistaDrop.addEventListener('change', calcularComision);
+        // Al cambiar estilista, cargar sus servicios
+        estilistaDrop.addEventListener('change', function() {
+            cargarServiciosPorEstilista(this.value);
+        });
+
         servicioDrop.addEventListener('change', calcularComision);
 
         // Calcular si hay valores pre-seleccionados

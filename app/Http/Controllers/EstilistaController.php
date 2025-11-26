@@ -11,9 +11,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
+use App\Traits\LogsActivity;
 
 class EstilistaController extends Controller
 {
+    use LogsActivity;
     /**
      * Display a listing of the resource.
      */
@@ -128,7 +130,7 @@ class EstilistaController extends Controller
             return redirect()->route('estilistas.index')->with('success', 'Estilista creado correctamente.');
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             if ($request->wantsJson()) {
                 return response()->json(['error' => 'Error al crear estilista: ' . $e->getMessage()], 500);
             }
@@ -227,7 +229,7 @@ class EstilistaController extends Controller
             return redirect()->route('estilistas.index')->with('success', 'Estilista actualizado correctamente.');
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             if ($request->wantsJson()) {
                 return response()->json(['error' => 'Error al actualizar estilista: ' . $e->getMessage()], 500);
             }

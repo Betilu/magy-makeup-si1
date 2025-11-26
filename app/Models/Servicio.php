@@ -45,5 +45,12 @@ class Servicio extends Model
         'categoria' => 'string',
         // 'duracion' se dejó como string en la migration.
     ];
+
+    /**
+     * Relación muchos a muchos con Estilista
+     */
+    public function estilistas()
+    {
+        return $this->belongsToMany(Estilista::class, 'estilista_servicio');
+    }
 }
- 

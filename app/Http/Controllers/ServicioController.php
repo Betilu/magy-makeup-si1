@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Servicio as ServicioModel;
+use App\Traits\LogsActivity;
 
 class ServicioController extends Controller
 {
+    use LogsActivity;
     /**
      * Display a listing of the resource.
      */
@@ -38,7 +40,13 @@ class ServicioController extends Controller
             'estado' => 'required|string',
         ]);
 
-        ServicioModel::create($data);
+        $servicio = ServicioModel::create($data);
+
+        // Registrar en bitácora
+        $this->logActivity(
+            'Crear Servicio',
+            "{$this->getCurrentUserName()} ({$this->getCurrentUserRole()}) creó el servicio '{$servicio->nombre}' - Categoría: {$servicio->categoria} - Precio: \${$servicio->precio_servicio}"
+        );
 
         return redirect()->route('servicios.index')->with('success', 'Servicio creado correctamente');
     }
@@ -49,6 +57,13 @@ class ServicioController extends Controller
     public function show(string $id)
     {
         $servicio = ServicioModel::findOrFail($id);
+
+        // Registrar en bitácora
+        $this->logActivity(
+            'Ver Servicio',
+            "{$this->getCurrentUserName()} ({$this->getCurrentUserRole()}) visualizó el servicio '{$servicio->nombre}'"
+        );
+
         return view('servicios.show', compact('servicio'));
     }
 
@@ -79,6 +94,12 @@ class ServicioController extends Controller
 
         $servicio->update($data);
 
+        // Registrar en bitácora
+        $this->logActivity(
+            'Editar Servicio',
+            "{$this->getCurrentUserName()} ({$this->getCurrentUserRole()}) editó el servicio '{$servicio->nombre}' - Categoría: {$servicio->categoria} - Precio: \${$servicio->precio_servicio}"
+        );
+
         return redirect()->route('servicios.index')->with('success', 'Servicio actualizado correctamente');
     }
 
@@ -88,7 +109,16 @@ class ServicioController extends Controller
     public function destroy(string $id)
     {
         $servicio = ServicioModel::findOrFail($id);
+        $servicioNombre = $servicio->nombre;
+        $servicioCategoria = $servicio->categoria;
+
         $servicio->delete();
+
+        // Registrar en bitácora
+        $this->logActivity(
+            'Eliminar Servicio',
+            "{$this->getCurrentUserName()} ({$this->getCurrentUserRole()}) eliminó el servicio '{$servicioNombre}' - Categoría: {$servicioCategoria}"
+        );
 
         return redirect()->route('servicios.index')->with('success', 'Servicio eliminado correctamente');
     }
