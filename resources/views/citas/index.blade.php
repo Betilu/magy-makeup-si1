@@ -21,7 +21,40 @@
         </div>
         <div class="card-body" style="padding:1.5rem;">
             @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong><svg class="icon me-2" style="width:16px; height:16px;"><use xlink:href="{{ asset('icons/coreui.svg#cil-check-circle') }}"></use></svg></strong>
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong><svg class="icon me-2" style="width:16px; height:16px;"><use xlink:href="{{ asset('icons/coreui.svg#cil-warning') }}"></use></svg>Error:</strong>
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if(session('modal_error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong><svg class="icon me-2" style="width:16px; height:16px;"><use xlink:href="{{ asset('icons/coreui.svg#cil-x-circle') }}"></use></svg>Conflicto de Horario:</strong>
+                    {{ session('modal_error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            <!-- Mostrar errores de validación en la página principal -->
+            @if($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong><svg class="icon me-2" style="width:20px; height:20px;"><use xlink:href="{{ asset('icons/coreui.svg#cil-warning') }}"></use></svg>Error de Validación:</strong>
+                    <ul class="mb-0 mt-2">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             @endif
 
             @if($citas->count())
@@ -163,6 +196,29 @@
                                         @method('PUT')
                                         @csrf
                                         <div class="modal-body">
+                                            <!-- Alerta de error de conflicto de horario -->
+                                            @if($errors->has('conflicto'))
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                <svg class="icon me-2" style="width:20px; height:20px;"><use xlink:href="{{ asset('icons/coreui.svg#cil-warning') }}"></use></svg>
+                                                <strong>Conflicto de Horario:</strong> {{ $errors->first('conflicto') }}
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                            @endif
+
+                                            <!-- Mostrar todos los errores de validación -->
+                                            @if($errors->any() && !$errors->has('conflicto'))
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                <svg class="icon me-2" style="width:20px; height:20px;"><use xlink:href="{{ asset('icons/coreui.svg#cil-warning') }}"></use></svg>
+                                                <strong>Error:</strong> Por favor, corrija los siguientes errores:
+                                                <ul class="mb-0 mt-2">
+                                                    @foreach($errors->all() as $error)
+                                                        <li>{{ $error }}</li>
+                                                    @endforeach
+                                                </ul>
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                            @endif
+
                                             <div class="mb-3">
                                                 <label class="form-label">Cliente</label>
                                                 <select name="user_id" class="form-select" required>
@@ -293,10 +349,42 @@
                 <form action="{{ route('citas.store') }}" method="post">
                     @csrf
                     <div class="modal-body">
-                        @php 
+                        <!-- Alerta de error de conflicto de horario desde sesión -->
+                        @if(session('modal_error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong><svg class="icon me-2" style="width:20px; height:20px;"><use xlink:href="{{ asset('icons/coreui.svg#cil-warning') }}"></use></svg>Conflicto de Horario:</strong>
+                            {{ session('modal_error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        @endif
+
+                        <!-- Alerta de error de conflicto de horario -->
+                        @if($errors->has('conflicto'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <svg class="icon me-2" style="width:20px; height:20px;"><use xlink:href="{{ asset('icons/coreui.svg#cil-warning') }}"></use></svg>
+                            <strong>Conflicto de Horario:</strong> {{ $errors->first('conflicto') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        @endif
+
+                        <!-- Mostrar todos los errores de validación -->
+                        @if($errors->any() && !$errors->has('conflicto'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <svg class="icon me-2" style="width:20px; height:20px;"><use xlink:href="{{ asset('icons/coreui.svg#cil-warning') }}"></use></svg>
+                            <strong>Error:</strong> Por favor, corrija los siguientes errores:
+                            <ul class="mb-0 mt-2">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        @endif
+
+                        @php
                             $isCliente = auth()->user()->hasRole('cliente') && !auth()->user()->hasRole('super-admin');
                         @endphp
-                        
+
                         @if(!$isCliente)
                         <div class="mb-3">
                             <label class="form-label">Cliente</label>
@@ -315,14 +403,14 @@
                             <strong>Cliente:</strong> {{ auth()->user()->name }}
                         </div>
                         @endif
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Estilista <span class="text-danger">*</span></label>
                                 <select name="estilista_id" class="form-select" required id="estilistaDrop">
                                     <option value="">Seleccione un estilista...</option>
                                     @foreach($estilistas as $estilista)
-                                        <option value="{{ $estilista->id }}" 
+                                        <option value="{{ $estilista->id }}"
                                                 data-comision="{{ $estilista->porcentaje_comision }}"
                                                 {{ old('estilista_id') == $estilista->id ? 'selected' : '' }}>
                                             {{ $estilista->user->name }}
@@ -342,7 +430,7 @@
                                 <select name="servicio_id" class="form-select" required id="servicioDrop">
                                     <option value="">Seleccione un servicio...</option>
                                     @foreach($servicios as $servicio)
-                                        <option value="{{ $servicio->id }}" 
+                                        <option value="{{ $servicio->id }}"
                                                 data-precio="{{ $servicio->precio_servicio }}"
                                                 {{ old('servicio_id') == $servicio->id ? 'selected' : '' }}>
                                             {{ $servicio->nombre }} - ${{ number_format($servicio->precio_servicio, 2) }}
@@ -372,7 +460,7 @@
                             </div>
                         </div>
                         @endif
-                        
+
                         @if(!$isCliente)
                         <div class="mb-3">
                             <label class="form-label">Estado</label>
@@ -420,6 +508,19 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Reabrir el modal si hay errores de validación o conflictos de horario
+    @if($errors->any() || session('modal_error'))
+        console.log('Hay errores de validación o conflicto de horario, abriendo modal...');
+        var modalElement = document.getElementById('crearCitaModal');
+        if (modalElement) {
+            var crearCitaModal = new bootstrap.Modal(modalElement, {
+                backdrop: 'static',
+                keyboard: false
+            });
+            crearCitaModal.show();
+        }
+    @endif
+
     const estilistaDrop = document.getElementById('estilistaDrop');
     const servicioDrop = document.getElementById('servicioDrop');
     const precioServicioEl = document.getElementById('precioServicio');
@@ -428,12 +529,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function calcularComision() {
         const servicioOption = servicioDrop.options[servicioDrop.selectedIndex];
         const estilistaOption = estilistaDrop.options[estilistaDrop.selectedIndex];
-        
+
         if (servicioOption && estilistaOption && servicioOption.value && estilistaOption.value) {
             const precio = parseFloat(servicioOption.dataset.precio) || 0;
             const comisionPorcentaje = parseFloat(estilistaOption.dataset.comision) || 0;
             const comision = (precio * comisionPorcentaje) / 100;
-            
+
             precioServicioEl.textContent = '$' + precio.toFixed(2);
             comisionEstilistaEl.textContent = '$' + comision.toFixed(2);
         } else {
@@ -445,7 +546,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (estilistaDrop && servicioDrop) {
         estilistaDrop.addEventListener('change', calcularComision);
         servicioDrop.addEventListener('change', calcularComision);
-        
+
         // Calcular si hay valores pre-seleccionados
         calcularComision();
     }

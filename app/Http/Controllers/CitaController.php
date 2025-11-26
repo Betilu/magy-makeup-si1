@@ -10,6 +10,7 @@ use App\Models\Estilista;
 use App\Models\Servicio;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CitaController extends Controller
 {
@@ -30,9 +31,9 @@ class CitaController extends Controller
     public function index()
     {
         $this->authorize('viewAny', Cita::class);
-        
+
         $user = Auth::user();
-        
+
         // Si es cliente, solo muestra sus propias citas
         if ($user->hasRole('cliente') && !$user->hasRole('super-admin')) {
             $citas = Cita::with(['user', 'estilista.user', 'servicio'])
@@ -45,14 +46,14 @@ class CitaController extends Controller
                 ->orderBy('fecha', 'desc')
                 ->paginate(15);
         }
-        
+
         // Obtener solo los usuarios que son clientes (tienen registro en tabla clients)
         $clientes = $this->getClientes();
-        
+
         // Obtener estilistas y servicios
         $estilistas = Estilista::with('user')->get();
         $servicios = Servicio::where('estado', 'activo')->get();
-        
+
         return view('citas.index', compact('citas', 'clientes', 'estilistas', 'servicios'));
     }
 
@@ -70,7 +71,7 @@ class CitaController extends Controller
     public function store(Request $request)
     {
         $this->authorize('create', Cita::class);
-        
+
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'estilista_id' => 'required|exists:estilistas,id',
@@ -90,7 +91,7 @@ class CitaController extends Controller
                 $validated['user_id'] = Auth::id();
                 $validated['estado'] = 'pendiente';
             }
-            
+
             // Si no se especificó estado, establecer como "pendiente"
             if (!isset($validated['estado'])) {
                 $validated['estado'] = 'pendiente';
@@ -99,7 +100,91 @@ class CitaController extends Controller
             // Obtener el servicio para calcular el precio
             $servicio = Servicio::findOrFail($validated['servicio_id']);
             $estilista = Estilista::findOrFail($validated['estilista_id']);
-            
+
+            // PASO 1: Obtener la duración del servicio y calcular hora de fin
+            $duracionMinutos = (int) $servicio->duracion; // Duración en minutos
+            $horaInicio = $validated['hora']; // Formato: "HH:MM"
+
+            // Calcular la hora de fin de la nueva cita
+            $horaFinNueva = date('H:i', strtotime($horaInicio . ' +' . $duracionMinutos . ' minutes'));
+
+            // PASO 2: Verificar conflictos de horario con la misma estilista
+            // Buscar todas las citas de la misma estilista en la misma fecha
+            $citasExistentes = Cita::with('servicio')
+                ->where('estilista_id', $validated['estilista_id'])
+                ->where('fecha', $validated['fecha'])
+                ->where('estado', '!=', 'cancelada')
+                ->get();
+
+            $hayConflicto = false;
+            $citaConflictiva = null;
+
+            // Log para depuración
+            Log::info("Verificando conflictos para nueva cita:", [
+                'estilista_id' => $validated['estilista_id'],
+                'fecha' => $validated['fecha'],
+                'hora_inicio' => $horaInicio,
+                'hora_fin' => $horaFinNueva,
+                'citas_existentes' => $citasExistentes->count()
+            ]);
+
+            foreach ($citasExistentes as $citaExistente) {
+                $horaInicioExistente = $citaExistente->hora;
+                $duracionExistente = (int) $citaExistente->servicio->duracion;
+                $horaFinExistente = date('H:i', strtotime($horaInicioExistente . ' +' . $duracionExistente . ' minutes'));
+
+                // 1. Convertir a timestamps base
+                $inicioNuevoTs = strtotime("2000-01-01 " . $horaInicio);
+                $finNuevoTs = strtotime("2000-01-01 " . $horaFinNueva);
+
+                $inicioExistenteTs = strtotime("2000-01-01 " . $horaInicioExistente);
+                $finExistenteTs = strtotime("2000-01-01 " . $horaFinExistente);
+
+                // 2. CORRECCIÓN CRÍTICA: Ajustar cruce de medianoche
+                // Si la hora fin es menor que la hora inicio, significa que termina al día siguiente
+                if ($finNuevoTs < $inicioNuevoTs) {
+                    $finNuevoTs += 86400; // Sumar 24 horas (1 día en segundos)
+                }
+
+                if ($finExistenteTs <= $inicioExistenteTs) {
+                    $finExistenteTs += 86400; // Sumar 24 horas
+                }
+
+                // Logs corregidos para verificar que ahora los números tienen sentido
+                Log::info("Comparando (CORREGIDO):", [
+                    'cita_id' => $citaExistente->id,
+                    'inicio_existente' => $inicioExistenteTs,
+                    'fin_existente_ajustado' => $finExistenteTs, // Debería ser mayor que inicio
+                    'inicio_nuevo' => $inicioNuevoTs,
+                    'fin_nuevo_ajustado' => $finNuevoTs
+                ]);
+
+                // 3. Verificar solapamiento con la lógica estándar
+                if (($inicioNuevoTs < $finExistenteTs) && ($finNuevoTs > $inicioExistenteTs)) {
+                    $hayConflicto = true;
+                    $citaConflictiva = $citaExistente;
+                    Log::warning("¡CONFLICTO DETECTADO!");
+                    break;
+                }
+            }            // PASO 3: Bloquear si hay conflictos
+            if ($hayConflicto) {
+                DB::rollBack();
+
+                $mensajeError = 'La estilista ya tiene una cita en ese horario';
+                if ($citaConflictiva) {
+                    $horaInicioConflicto = $citaConflictiva->hora;
+                    $duracionConflicto = (int) $citaConflictiva->servicio->duracion;
+                    $horaFinConflicto = date('H:i', strtotime($horaInicioConflicto . ' +' . $duracionConflicto . ' minutes'));
+                    $mensajeError .= " (ocupada de {$horaInicioConflicto} a {$horaFinConflicto})";
+                }
+                $mensajeError .= '. Por favor, selecciona otro horario.';
+
+                return redirect()
+                    ->route('citas.index')
+                    ->with('modal_error', $mensajeError)
+                    ->withInput();
+            }
+
             // Calcular precio total y comisión
             $validated['precio_total'] = $servicio->precio_servicio;
             $validated['comision_estilista'] = $estilista->calcularComision($servicio->precio_servicio);
@@ -107,9 +192,8 @@ class CitaController extends Controller
             // Crear la cita
             $cita = Cita::create($validated);
 
-            // Actualizar total de comisiones del estilista
-            $estilista->total_comisiones += $validated['comision_estilista'];
-            $estilista->save();
+            // Actualizar total de comisiones del estilista usando increment
+            $estilista->increment('total_comisiones', $validated['comision_estilista']);
 
             DB::commit();
 
@@ -163,26 +247,80 @@ class CitaController extends Controller
             // Si cambiaron el servicio o estilista, recalcular comisiones
             $servicioAnterior = $cita->servicio;
             $estilistaAnterior = $cita->estilista;
-            
+
             $servicio = Servicio::findOrFail($validated['servicio_id']);
             $estilista = Estilista::findOrFail($validated['estilista_id']);
-            
+
+            // PASO 1: Obtener la duración del servicio y calcular hora de fin
+            $duracionMinutos = (int) $servicio->duracion; // Duración en minutos
+            $horaInicio = $validated['hora']; // Formato: "HH:MM"
+
+            // Calcular la hora de fin de la cita editada
+            $horaFinNueva = date('H:i', strtotime($horaInicio . ' +' . $duracionMinutos . ' minutes'));
+
+            // PASO 2: Verificar conflictos de horario con la misma estilista (excluyendo la cita actual)
+            $citasExistentes = Cita::with('servicio')
+                ->where('estilista_id', $validated['estilista_id'])
+                ->where('fecha', $validated['fecha'])
+                ->where('id', '!=', $id) // Excluir la cita que se está editando
+                ->where('estado', '!=', 'cancelada')
+                ->get();
+
+            $hayConflicto = false;
+            $citaConflictiva = null;
+
+            foreach ($citasExistentes as $citaExistente) {
+                $horaInicioExistente = $citaExistente->hora;
+                $duracionExistente = (int) $citaExistente->servicio->duracion;
+                $horaFinExistente = date('H:i', strtotime($horaInicioExistente . ' +' . $duracionExistente . ' minutes'));
+
+                // Convertir a timestamps para comparación precisa
+                $inicioNuevoTs = strtotime("2000-01-01 " . $horaInicio);
+                $finNuevoTs = strtotime("2000-01-01 " . $horaFinNueva);
+                $inicioExistenteTs = strtotime("2000-01-01 " . $horaInicioExistente);
+                $finExistenteTs = strtotime("2000-01-01 " . $horaFinExistente);
+
+                // Verificar si hay solapamiento
+                if (($inicioNuevoTs < $finExistenteTs) && ($finNuevoTs > $inicioExistenteTs)) {
+                    $hayConflicto = true;
+                    $citaConflictiva = $citaExistente;
+                    break;
+                }
+            }
+
+            // PASO 3: Bloquear si hay conflictos
+            if ($hayConflicto) {
+                DB::rollBack();
+
+                $mensajeError = 'La estilista ya tiene una cita en ese horario';
+                if ($citaConflictiva) {
+                    $horaInicioConflicto = $citaConflictiva->hora;
+                    $duracionConflicto = (int) $citaConflictiva->servicio->duracion;
+                    $horaFinConflicto = date('H:i', strtotime($horaInicioConflicto . ' +' . $duracionConflicto . ' minutes'));
+                    $mensajeError .= " (ocupada de {$horaInicioConflicto} a {$horaFinConflicto})";
+                }
+                $mensajeError .= '. Por favor, selecciona otro horario.';
+
+                return redirect()
+                    ->route('citas.index')
+                    ->with('modal_error', $mensajeError)
+                    ->withInput();
+            }
+
             // Restar comisión anterior del estilista anterior
             if ($estilistaAnterior) {
-                $estilistaAnterior->total_comisiones -= $cita->comision_estilista;
-                $estilistaAnterior->save();
+                $estilistaAnterior->decrement('total_comisiones', (float) $cita->comision_estilista);
             }
-            
+
             // Calcular nuevo precio total y comisión
             $validated['precio_total'] = $servicio->precio_servicio;
             $validated['comision_estilista'] = $estilista->calcularComision($servicio->precio_servicio);
-            
+
             // Actualizar la cita
             $cita->update($validated);
-            
+
             // Sumar nueva comisión al estilista
-            $estilista->total_comisiones += $validated['comision_estilista'];
-            $estilista->save();
+            $estilista->increment('total_comisiones', $validated['comision_estilista']);
 
             DB::commit();
 
@@ -200,19 +338,18 @@ class CitaController extends Controller
     {
         $cita = Cita::findOrFail($id);
         $this->authorize('delete', $cita);
-        
+
         DB::beginTransaction();
         try {
             // Restar la comisión del estilista antes de eliminar
-            if ($cita->estilista) {
-                $cita->estilista->total_comisiones -= $cita->comision_estilista;
-                $cita->estilista->save();
+            if ($cita->estilista && $cita->comision_estilista) {
+                $cita->estilista->decrement('total_comisiones', (float) $cita->comision_estilista);
             }
-            
+
             $cita->delete();
-            
+
             DB::commit();
-            
+
             return redirect()->route('citas.index')->with('success', 'Cita eliminada correctamente');
         } catch (\Exception $e) {
             DB::rollBack();
