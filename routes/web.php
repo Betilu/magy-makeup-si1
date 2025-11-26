@@ -91,4 +91,18 @@ Route::middleware('auth')->group(function () {
     Route::resource('incidencias', \App\Http\Controllers\IncidenciaController::class);
 
     Route::resource('books', BookController::class)->only('index');
+
+    // Rutas de pagos con Stripe
+    Route::post('payment/checkout', [\App\Http\Controllers\PaymentController::class, 'createCheckoutSession'])
+        ->name('payment.checkout');
+    Route::get('payment/success/{cita_id}', [\App\Http\Controllers\PaymentController::class, 'success'])
+        ->name('payment.success');
+    Route::get('payment/cancel/{cita_id}', [\App\Http\Controllers\PaymentController::class, 'cancel'])
+        ->name('payment.cancel');
+    Route::get('payment/historial/{cita_id}', [\App\Http\Controllers\PaymentController::class, 'historial'])
+        ->name('payment.historial');
 });
+
+// Webhook de Stripe (sin middleware auth porque Stripe lo llama directamente)
+Route::post('webhook/stripe', [\App\Http\Controllers\PaymentController::class, 'webhook'])
+    ->name('webhook.stripe');

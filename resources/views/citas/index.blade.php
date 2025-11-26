@@ -114,9 +114,117 @@
                                     @can('delete', $cita)
                                     <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCitaModal-{{ $cita->id }}">Eliminar</button>
                                     @endcan
+
+                                    {{-- Botón de Pago --}}
+                                    @if($cita->saldoPendiente() > 0 && ($cita->estado === 'pendiente' || $cita->estado === 'confirmada'))
+                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#pagoModal-{{ $cita->id }}" title="Realizar pago">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-credit-card" viewBox="0 0 16 16">
+                                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7z"/>
+                                                <path d="M2 10a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z"/>
+                                            </svg>
+                                        </button>
+                                    @endif
+
+                                    {{-- Botón de Historial de Pagos --}}
+                                    @if($cita->pagos->count() > 0)
+                                        <a href="{{ route('payment.historial', $cita->id) }}" class="btn btn-sm btn-outline-info" title="Ver historial de pagos">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-receipt" viewBox="0 0 16 16">
+                                                <path d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v12a.5.5 0 0 1-.053.224l-.5 1a.5.5 0 0 1-.8.13L13 14.707l-.646.647a.5.5 0 0 1-.708 0L11 14.707l-.646.647a.5.5 0 0 1-.708 0L9 14.707l-.646.647a.5.5 0 0 1-.708 0L7 14.707l-.646.647a.5.5 0 0 1-.708 0L5 14.707l-.646.647a.5.5 0 0 1-.708 0L3 14.707l-.646.647a.5.5 0 0 1-.801-.13l-.5-1A.5.5 0 0 1 1 14V2a.5.5 0 0 1 .053-.224l.5-1a.5.5 0 0 1 .367-.27z"/>
+                                            </svg>
+                                        </a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
+
+                        {{-- Modal de Pago --}}
+                        @if($cita->saldoPendiente() > 0)
+                        <div class="modal fade" id="pagoModal-{{ $cita->id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-success text-white">
+                                        <h5 class="modal-title">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-credit-card me-2" viewBox="0 0 16 16">
+                                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7z"/>
+                                            </svg>
+                                            Realizar Pago - Cita #{{ $cita->id }}
+                                        </h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="alert alert-info">
+                                            <h6>Información de la Cita</h6>
+                                            <p class="mb-1"><strong>Servicio:</strong> {{ $cita->servicio->nombre ?? 'N/A' }}</p>
+                                            <p class="mb-1"><strong>Fecha:</strong> {{ $cita->fecha }} - {{ $cita->hora }}</p>
+                                            <p class="mb-0"><strong>Precio Total:</strong> ${{ number_format($cita->precio_total, 2) }}</p>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <small class="text-muted d-block">Pagado</small>
+                                                        <h5 class="text-success mb-0">${{ number_format($cita->totalPagado(), 2) }}</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <small class="text-muted d-block">Pendiente</small>
+                                                        <h5 class="text-danger mb-0">${{ number_format($cita->saldoPendiente(), 2) }}</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-grid gap-2">
+                                            @if($cita->anticipo > 0 && $cita->totalPagado() == 0)
+                                            <form action="{{ route('payment.checkout') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="cita_id" value="{{ $cita->id }}">
+                                                <input type="hidden" name="tipo_pago" value="anticipo">
+                                                <button type="submit" class="btn btn-warning btn-lg w-100">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cash me-2" viewBox="0 0 16 16">
+                                                        <path d="M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+                                                        <path d="M0 4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V4zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V6a2 2 0 0 1-2-2H3z"/>
+                                                    </svg>
+                                                    Pagar Anticipo - ${{ number_format($cita->anticipo, 2) }}
+                                                </button>
+                                            </form>
+                                            @endif
+
+                                            <form action="{{ route('payment.checkout') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="cita_id" value="{{ $cita->id }}">
+                                                <input type="hidden" name="tipo_pago" value="total">
+                                                <button type="submit" class="btn btn-success btn-lg w-100">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle me-2" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                        <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+                                                    </svg>
+                                                    Pagar Total - ${{ number_format($cita->saldoPendiente(), 2) }}
+                                                </button>
+                                            </form>
+                                        </div>
+
+                                        <div class="mt-3 text-center">
+                                            <small class="text-muted">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-shield-check me-1" viewBox="0 0 16 16">
+                                                    <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
+                                                    <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                                                </svg>
+                                                Pago seguro procesado por Stripe
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
 
                         <!-- Show Modal -->
                         @can('view', $cita)
